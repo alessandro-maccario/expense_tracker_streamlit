@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "expense-tracker"
+version = "0.1.0"
+description = ""
+authors = ["alessandro-maccario <a.maccario1@campus.unimib.it>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.9.7 || >3.9.7,<4.0"
+pandas = "^2.2.1"
+numpy = "^1.26.4"
+openpyxl = "^3.1.2"
+streamlit = "^1.32.2"
+plotly = "^5.20.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
