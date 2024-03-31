@@ -4,13 +4,14 @@
     budget management strategy.
 """
 
-# TODO
 # use streamlit
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 import datetime
+import plotly.graph_objects as go
+
 
 # define the start date and end date
 today = datetime.date.today()
@@ -92,7 +93,7 @@ with st.sidebar:
 
 # sort the data by date
 df_expenses.sort_values(by=["date"], inplace=True)
-print(df_expenses.head())
+# print(df_expenses.head())
 
 previous_30_days = past_date - datetime.timedelta(days=30)
 # Filter data between the past date and 30 days earlier.
@@ -102,7 +103,7 @@ df_expenses_previous_30_days = df_expenses.loc[
     & (df_expenses["date"].dt.date < past_date)
 ]
 
-#  Filter data between two dates
+#  Filter data between two dates for the expense_category bar plot
 df_expenses_filtered = df_expenses.loc[
     (df_expenses["date"].dt.date >= past_date)
     & (df_expenses["date"].dt.date < today_date)
@@ -111,12 +112,41 @@ df_expenses_filtered = df_expenses.loc[
 #  Filter data for year
 df_expenses_filtered_year = df_expenses.loc[(df_expenses["year"] == int(choose_year))]
 
+# set the index using the expense_category column
+df_expenses_filtered_for_category = df_expenses_filtered.set_index("expense_category")
+df_expenses_filtered_year_grouped = df_expenses_filtered.groupby(
+    "expense_category",
+)[["value"]].sum()
+
 fig_bar_chart = px.bar(
-    df_expenses_filtered,
+    df_expenses_filtered.sort_index(ascending=False),
     x="expense_category",
     y="value",
     color="expense_category",
     title="Expenses per category",
+)
+
+# get the list of unique element in the index
+x_coords = list(set(df_expenses_filtered_year_grouped.index))
+
+# Create a DataFrame with the desired order of the categories
+category_order_df = pd.DataFrame(index=x_coords)
+
+fig_bar_chart.add_trace(
+    go.Scatter(
+        x=x_coords,
+        # used the previous df to sort the categories as the reordered one
+        y=df_expenses_filtered_year_grouped["value"].reindex(category_order_df.index),
+        text=df_expenses_filtered_year_grouped["value"].reindex(
+            category_order_df.index
+        ),
+        mode="text",
+        textposition="top center",
+        textfont=dict(
+            size=11,
+        ),
+        showlegend=False,
+    )
 )
 
 fig_pie_plot = px.pie(
@@ -128,13 +158,49 @@ fig_pie_plot = px.pie(
 
 # get statistics using a line chart
 fig_line_chart = px.line(
-    df_expenses,
+    df_expenses.groupby("date").sum().reset_index(),
     x="date",
     y="value",
-    color="year",
-    title="Expenses per month and year",
+    # color="year",
+    title="Expenses per month",
+)
+# Calculate monthly averages
+# Resample to month and calculate average value for each month
+df_expenses_subdf = df_expenses[["date", "value"]]
+df_expenses_subdf["value"] = pd.to_numeric(df_expenses_subdf["value"])
+# take the average daily expenses per month
+monthly_avg_values_per_day = df_expenses_subdf.resample("ME", on="date").sum() / 30
+# print(monthly_avg_values_per_day)
+
+# add horizontal line as the average line
+# fig_line_chart.add_hline(
+#     y=df_expenses.groupby("date").sum().reset_index()["value"].mean(),
+#     line_color="red",
+#     annotation_text="average",
+# )
+# Plot the average expenses per day in a month
+fig_line_chart.add_trace(
+    go.Scatter(
+        x=monthly_avg_values_per_day.index,
+        y=monthly_avg_values_per_day["value"],
+        mode="lines",
+        name="Daily Average per month",
+        line=dict(color="#FF0000"),
+    )
+)
+# Update layout (optional)
+fig_line_chart.update_layout(
+    title="Expenses Over Time", xaxis_title="Date", yaxis_title="Expenses"
 )
 
+
+# filter the df out using the "choose_year" filter for the year
+df_expenses_subdf_by_month_per_year = df_expenses[df_expenses["year"] == choose_year]
+# get only the month and the values
+df_expenses_subdf_by_month = df_expenses_subdf_by_month_per_year[["month", "value"]]
+# take the average daily expenses per month
+monthly_sum_values = df_expenses_subdf_by_month.groupby(["month"]).sum()
+# print(monthly_sum_values)
 # get statistics per months, using a bar plot
 fig_bar_chart_months = px.bar(
     df_expenses_filtered_year,
@@ -142,6 +208,20 @@ fig_bar_chart_months = px.bar(
     y="value",
     color="expense_category",
     title="Expenses per month and category",
+)
+# Plot the average expenses per month
+fig_bar_chart_months.add_trace(
+    go.Scatter(
+        x=monthly_sum_values.index,
+        y=monthly_sum_values["value"],
+        mode="lines",
+        name="Sum per month",
+        line=dict(color="#FF0000"),
+    )
+)
+# Update layout (optional)
+fig_bar_chart_months.update_layout(
+    title="Expenses per Month", xaxis_title="Date", yaxis_title="Expenses"
 )
 
 # --- Metrics --- #
@@ -202,13 +282,13 @@ df_expenses_filtered_year_bar_plot = df_expenses_filtered_year.loc[
 # get statistics per months, using a bar plot
 fig_bar_chart_week = px.bar(
     df_expenses_filtered_year_bar_plot.groupby(["weekday_text"])["value"]
-    .agg(["mean"])
+    .agg(["sum"])
     .reset_index(),
     # df_expenses,
     x="weekday_text",
-    y="mean",
+    y="sum",
     # color="expense_category",
-    title="Expenses per weekday",
+    title="Expenses per weekday per store",
 )
 fig_bar_chart_week.update_xaxes(
     categoryorder="array",
@@ -233,19 +313,6 @@ st.plotly_chart(
 # TODO
 # Need to show the bar plots using only the sum of all the items,
 # not to show the single item in the bar plot!
-
-# TODO
-# Add a selector for selecting the category to filter in the plot AND
-# in the metric!
-# You can calculate the previous month expense value compare to the current month
-# and then add a DELTA value in the metric to see if it went up or down.
-
-# TODO:
-# Add metric that computes the difference between the current timeframe
-# selected for total expenses and prior 30 days
-
-# TODO:
-# Add a line plot that plots the average spending for the week!
 
 # TODO:
 # in the plot for the weekday and the stores, groupby and show only the first 10 stores
