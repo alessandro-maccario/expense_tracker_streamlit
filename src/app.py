@@ -57,7 +57,7 @@ with st.sidebar:
 
         # select the year to filter out
         choose_year = st.selectbox(
-            "Select the year to filter the Bar Plot for the expense for month and category",
+            "Bar plot - Expenses per month",
             df_expenses["year"].unique(),
         )
 
@@ -119,7 +119,7 @@ df_expenses_filtered_year_grouped = df_expenses_filtered.groupby(
 )[["value"]].sum()
 
 fig_bar_chart = px.bar(
-    df_expenses_filtered.sort_index(ascending=False),
+    df_expenses_filtered.groupby("expense_category")["value"].sum().reset_index(),
     x="expense_category",
     y="value",
     color="expense_category",
@@ -203,7 +203,9 @@ monthly_sum_values = df_expenses_subdf_by_month.groupby(["month"]).sum()
 # print(monthly_sum_values)
 # get statistics per months, using a bar plot
 fig_bar_chart_months = px.bar(
-    df_expenses_filtered_year,
+    df_expenses_filtered_year.groupby(["expense_category", "month"])["value"]
+    .sum()
+    .reset_index(),
     x="month",
     y="value",
     color="expense_category",
@@ -264,32 +266,71 @@ st.plotly_chart(
     theme="streamlit",
 )
 
+
+# filter the data to keep only those rows where there are multiple days considered
+# (filter out all those data that shows only one day purchase - filter out outliers)
+
+# Group by "store" and count the number of how many times a store appears in the data
+# If it appears only one, then it has been only a one-time purchase, not useful
+# for showing statistics about it.
+
+# Filter out rows where the number of unique store appearance more than 7 related to "food" category
+grouped_counts = (
+    df_expenses_filtered_year[df_expenses_filtered_year["expense_category"] == "food"]
+    .groupby(["store"])
+    .size()
+    .reset_index(name="count")
+    .sort_values(by="count")
+)
+print(grouped_counts[grouped_counts["count"] > 7])
+grouped_counts = grouped_counts[grouped_counts["count"] > 7]
+
+# Merge the filtered dataframe with the original one on the "store" column
+# therefore you will get only those stores that appear in the data more than
+# 7 times.
+df_expenses_size_filtering_year = df_expenses_filtered_year.merge(
+    grouped_counts[["store"]],
+    on=["store"],
+    how="inner",
+)
+
+# show the store options
 option = st.selectbox(
     "Select the store",
-    df_expenses_filtered_year.sort_values(by="store", ascending=True)["store"]
+    # show me only those options related to food
+    df_expenses_size_filtering_year[
+        df_expenses_size_filtering_year["expense_category"] == "food"
+    ]
+    .sort_values(by="store", ascending=True)["store"]
     .str.lower()
     .unique(),
     placeholder="Select the store...",
 )
 
+
+# filter the dataframe based on the chosen option
 df_expenses_filtered_year_bar_plot = df_expenses_filtered_year.loc[
     (df_expenses_filtered_year["store"] == option)
 ]
 
 # --- Dropdown menu to select the store for the bar plot --- #
-
-# DOES NOT WORK WITH THE FILTERING! --> https://discuss.streamlit.io/t/filter-dataframe-by-selections-made-in-select-box/6627
 # get statistics per months, using a bar plot
 fig_bar_chart_week = px.bar(
     df_expenses_filtered_year_bar_plot.groupby(["weekday_text"])["value"]
-    .agg(["sum"])
+    .agg(["mean"])
     .reset_index(),
-    # df_expenses,
     x="weekday_text",
-    y="sum",
-    # color="expense_category",
-    title="Expenses per weekday per store",
+    y="mean",
+    title="Expenses per weekday per store - Food category",
 )
+
+st.plotly_chart(
+    fig_bar_chart_week,
+    use_container_width=True,
+    sharing="streamlit",
+    theme="streamlit",
+)
+
 fig_bar_chart_week.update_xaxes(
     categoryorder="array",
     categoryarray=[
@@ -303,13 +344,6 @@ fig_bar_chart_week.update_xaxes(
     ],
 )
 
-st.plotly_chart(
-    fig_bar_chart_week,
-    use_container_width=True,
-    sharing="streamlit",
-    theme="streamlit",
-)
-
 # TODO
 # Need to show the bar plots using only the sum of all the items,
 # not to show the single item in the bar plot!
@@ -321,3 +355,18 @@ st.plotly_chart(
 # TODO:
 # add a metric to show the most expensive category of the timeframe selected
 # and the amount spent in the timeframe selected compared to the previous month
+
+# TODO
+# Add the following information: most expensive category, and you want to try to reduce the amount
+# spent, for instance on food. Therefore you set a limit of 5/10% of saving on food each month.
+# You also need another metric that tells you: how much you spent on food compare to the previous
+# month (literally, taken from the month before), how much you saved so far (for instance, after
+# a few months later) and how far you are in reaching your goal (if the goal is reaching 500€ per year
+# saved, then you can show how much you already saved and how much you still need to reach the goal)!
+# You should also record this data, but you have to think how.
+
+# TODO:
+# Create the database underneath to stop using the csv file. In the future, record the data directly in
+# the DB. In order to do that, you should have another page connected to your db in streamlit that
+# gives you the possibility to record the expenses and directly see the results of your new data directly
+# in the plots.
