@@ -48,6 +48,11 @@ with st.sidebar:
         # --- Create columns to position the plots --- #
         # plots
         date1, date2, date3 = st.columns((1, 0.1, 1))
+        # define a text before the date_input
+        st.markdown(
+            "Use the date picker to select the timeframe and show the values for the Bar plot (Expenses per Category) and the Pie Plot (Expenses per Store)",
+            unsafe_allow_html=False,
+        )
         # define start and end date
         past_date = date1.date_input("From", past)
         today_date = date3.date_input("To", today)
@@ -125,6 +130,14 @@ fig_bar_chart = px.bar(
     color="expense_category",
     title="Expenses per category",
 )
+fig_bar_chart.update_layout(
+    barmode="stack", xaxis={"categoryorder": "total descending"}
+)
+# Update layout (optional)
+fig_bar_chart.update_layout(
+    title="Expenses per category", xaxis_title="Category", yaxis_title="Expenses"
+)
+
 
 # get the list of unique element in the index
 x_coords = list(set(df_expenses_filtered_year_grouped.index))
@@ -154,7 +167,13 @@ fig_pie_plot = px.pie(
     values="value",
     names="store",
     title="Expenses per store",
+    hole=0.5,
 )
+# update the pie plot to insert the label inside the slice
+# and to hide those labels that are too small to be read
+fig_pie_plot.update_traces(textposition="inside")
+fig_pie_plot.update_layout(uniformtext_minsize=12, uniformtext_mode="hide")
+
 
 # get statistics using a line chart
 fig_line_chart = px.line(
@@ -178,6 +197,7 @@ monthly_avg_values_per_day = df_expenses_subdf.resample("ME", on="date").sum() /
 #     line_color="red",
 #     annotation_text="average",
 # )
+
 # Plot the average expenses per day in a month
 fig_line_chart.add_trace(
     go.Scatter(
@@ -188,7 +208,7 @@ fig_line_chart.add_trace(
         line=dict(color="#FF0000"),
     )
 )
-# Update layout (optional)
+# Update layout
 fig_line_chart.update_layout(
     title="Expenses Over Time", xaxis_title="Date", yaxis_title="Expenses"
 )
@@ -229,18 +249,57 @@ fig_bar_chart_months.update_layout(
 # --- Metrics --- #
 # calculate total amount spent in the current timeframe selected
 current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
+# calculate total amount ONLY for food (for the selected timeframe)
+current_food_total_expenses = round(
+    df_expenses_filtered[df_expenses_filtered["expense_category"] == "food"]
+    .groupby(["expense_category"])["value"]
+    .sum(),
+    2,
+)
 # calculate the total amount spent in the previous 30 days from past_date
 total_expenses_previous_30_days = round(df_expenses_previous_30_days["value"].sum(), 2)
 
 # take the difference between the current timeframe and the previous 30 days, then show the value
 # as a metric
 diff_total_expenses = round(current_total_expenses - total_expenses_previous_30_days, 2)
+# calculate total amount ONLY for food (for the 30 days before the "From" date)
+total_expenses_previous_30_days_food = round(
+    df_expenses_previous_30_days[
+        df_expenses_previous_30_days["expense_category"] == "food"
+    ]
+    .groupby(["expense_category"])["value"]
+    .sum(),
+    2,
+)
+# take the difference between the current timeframe and the previous 30 days, then show the value
+# as a metric ONLY for the food category
+diff_total_expenses_food = round(
+    current_food_total_expenses - total_expenses_previous_30_days_food, 2
+)
+
+##################################################
+# --- Create columns to position the metrics --- #
+metric1, metric2 = st.columns((2, 2))
 
 # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
-st.metric(
-    label="Total amount spent in the timeframe selected",
+metric1.metric(
+    label="Expenses in the timeframe",
     value=current_total_expenses,
     delta=diff_total_expenses,
+    delta_color="inverse",
+)
+# define a text before the date_input
+st.markdown(
+    "The delta shows the current  total, minus the last 30 days expenses compare to the 'From' day. If negative, you spent less; if positive you spent more.",
+    unsafe_allow_html=False,
+)
+
+# --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
+metric2.metric(
+    label="Expenses for food",
+    value=current_food_total_expenses,
+    delta=diff_total_expenses_food[0],
+    delta_color="inverse",
 )
 
 # --- Create columns to position the plots --- #
@@ -317,11 +376,22 @@ df_expenses_filtered_year_bar_plot = df_expenses_filtered_year.loc[
 # get statistics per months, using a bar plot
 fig_bar_chart_week = px.bar(
     df_expenses_filtered_year_bar_plot.groupby(["weekday_text"])["value"]
-    .agg(["mean"])
+    .agg(["sum"])
     .reset_index(),
     x="weekday_text",
-    y="mean",
-    title="Expenses per weekday per store - Food category",
+    y="sum",
+    title="Sum of Expenses per weekday per store - Food category",
+    category_orders={
+        "weekday_text": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+        ],
+    },
 )
 
 st.plotly_chart(
@@ -344,17 +414,10 @@ fig_bar_chart_week.update_xaxes(
     ],
 )
 
-# TODO
-# Need to show the bar plots using only the sum of all the items,
-# not to show the single item in the bar plot!
-
-# TODO:
-# in the plot for the weekday and the stores, groupby and show only the first 10 stores
-# with the highest values!
-
-# TODO:
-# add a metric to show the most expensive category of the timeframe selected
-# and the amount spent in the timeframe selected compared to the previous month
+# --- CSS hacks --- #
+#
+with open(r"C:\solutions\learning_python\expense_tracker\src\pkgs\style.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # TODO
 # Add the following information: most expensive category, and you want to try to reduce the amount
@@ -366,7 +429,7 @@ fig_bar_chart_week.update_xaxes(
 # You should also record this data, but you have to think how.
 
 # TODO:
-# Create the database underneath to stop using the csv file. In the future, record the data directly in
+# Create the database to stop using the csv file. In the future, record the data directly in
 # the DB. In order to do that, you should have another page connected to your db in streamlit that
 # gives you the possibility to record the expenses and directly see the results of your new data directly
 # in the plots.
