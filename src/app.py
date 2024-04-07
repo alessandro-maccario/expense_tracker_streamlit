@@ -229,7 +229,7 @@ fig_bar_chart_months = px.bar(
     x="month",
     y="value",
     color="expense_category",
-    title="Expenses per month and category",
+    # title="Expenses per month and category",
 )
 # Plot the average expenses per month
 fig_bar_chart_months.add_trace(
@@ -241,7 +241,7 @@ fig_bar_chart_months.add_trace(
         line=dict(color="#FF0000"),
     )
 )
-# Update layout (optional)
+# Update layout
 fig_bar_chart_months.update_layout(
     title="Expenses per Month", xaxis_title="Date", yaxis_title="Expenses"
 )
@@ -433,3 +433,6 @@ with open(r"C:\solutions\learning_python\expense_tracker\src\pkgs\style.css") as
 # the DB. In order to do that, you should have another page connected to your db in streamlit that
 # gives you the possibility to record the expenses and directly see the results of your new data directly
 # in the plots.
+
+# TODO:
+# merge the current branch to the main one and create a dev branch to be used
