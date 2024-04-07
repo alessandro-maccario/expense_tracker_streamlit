@@ -5,11 +5,10 @@
 """
 
 # use streamlit
-import numpy as np
-import pandas as pd
-import plotly.express as px
-import streamlit as st
 import datetime
+import pandas as pd
+import streamlit as st
+import plotly.express as px
 import plotly.graph_objects as go
 
 
@@ -46,7 +45,7 @@ with st.sidebar:
         date1, date2, date3 = st.columns((1, 0.1, 1))
         # define a text before the date_input
         st.markdown(
-            "Use the date picker to select the timeframe and show the values for the Bar plot (Expenses per Category) and the Pie Plot (Expenses per Store)",
+            "Use the date picker to select the timeframe and show the values for the Bar plot (Expenses per Category) and the Donut Chart (Expenses per Store)",
             unsafe_allow_html=False,
         )
         # define start and end date
@@ -57,20 +56,7 @@ with st.sidebar:
         st.divider()
 
     else:
-        # load the expenses file
-        df_expenses = pd.read_excel(
-            r"C:\solutions\learning_python\expense_tracker\data\data_example.xlsx",
-            converters={"date": pd.to_datetime},
-        )
-
-        # --- Create columns to position the plots --- #
-        # plots
-        date1, date2, date3 = st.columns((1, 0.1, 1))
-        # define start and end date
-        past_date = date1.date_input("From", past)
-        today_date = date3.date_input("To", today)
-
-        # separator
+        st.markdown("TEXT EXAMPLE")
         st.divider()
 
 
@@ -142,7 +128,7 @@ fig_pie_plot = px.pie(
     values="value",
     names="store",
     title="Expenses per store",
-    hole=0.5,
+    hole=0.7,
 )
 # update the pie plot to insert the label inside the slice
 # and to hide those labels that are too small to be read
@@ -202,7 +188,7 @@ st.markdown(
 metric2.metric(
     label="Expenses for food",
     value=current_food_total_expenses,
-    delta=diff_total_expenses_food[0],
+    delta=diff_total_expenses_food.iloc[0],
     delta_color="inverse",
 )
 
@@ -256,7 +242,6 @@ fig_bar_chart_months = px.bar(
     x="month",
     y="value",
     color="expense_category",
-    # title="Expenses per month and category",
 )
 # Plot the average expenses per month
 fig_bar_chart_months.add_trace(
@@ -296,7 +281,7 @@ grouped_counts = (
     .reset_index(name="count")
     .sort_values(by="count")
 )
-print(grouped_counts[grouped_counts["count"] > 7])
+# print(grouped_counts[grouped_counts["count"] > 7])
 grouped_counts = grouped_counts[grouped_counts["count"] > 7]
 
 # Merge the filtered dataframe with the original one on the "store" column
@@ -342,7 +327,7 @@ fig_bar_chart_week = px.bar(
     .reset_index(),
     x="weekday_text",
     y="sum",
-    title="Sum of Expenses per weekday per store - Food category",
+    title="Daily sum for food expenses per store",
     category_orders={
         "weekday_text": [
             "Monday",
@@ -354,6 +339,10 @@ fig_bar_chart_week = px.bar(
             "Sunday",
         ],
     },
+)
+# Update layout
+fig_bar_chart_week.update_layout(
+    xaxis_title="Day of the week", yaxis_title="Sum of expenses"
 )
 
 st.plotly_chart(
@@ -395,6 +384,3 @@ with open(r"C:\solutions\learning_python\expense_tracker\src\pkgs\style.css") as
 # the DB. In order to do that, you should have another page connected to your db in streamlit that
 # gives you the possibility to record the expenses and directly see the results of your new data directly
 # in the plots.
-
-# TODO:
-# merge the current branch to the main one and create a dev branch to be used
