@@ -60,7 +60,7 @@ with st.sidebar:
 # otherwise show the hint to upload it.
 # sort the data by date
 if uploaded_file is not None:
-    st.subheader("Select the timeframe for the bar plot, donut chart and the metrics")
+    st.subheader("Select the timeframe that you want to analyze")
     df_expenses.sort_values(by=["date"], inplace=True)
 
     ###############################################
@@ -429,7 +429,10 @@ if uploaded_file is not None:
 # Try to move the metrics and the plots in two different files and then called them as packages in this
 # main one.
 
+# TODO:
+# add the Expenses per category in % with, maybe, a radar plot (?)
+
 else:
     st.text(
-        "To start the dashboard please, upload a file using the button on the left."
+        "To start the dashboard please, upload a file using the button on the sidebar."
     )
