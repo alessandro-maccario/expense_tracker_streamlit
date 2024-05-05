@@ -8,18 +8,158 @@
 import datetime
 import pandas as pd
 import streamlit as st
+
+from pkgs.global_vars import today, past
 import plotly.express as px
 import plotly.graph_objects as go
 
 
-# define the start date and end date
-today = datetime.date.today()
-# get the last 30 days starting from today
-past = today - datetime.timedelta(days=30)
+# --- Metric functions --- #
+
+
+def metric_total_amount_spent(df, today_date, past_date):
+    """
+    Function to calculate the total amount spent in a specific timeframe.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Original dataframe
+    today_date : str
+        "To" date. Most recent date until which you want to filter.
+    past_date : str
+        "From" date. Past date from which you want to start filtering.
+
+    Returns
+    -------
+    None
+        Return the metrics computed for the metric to be displayed.
+    """
+
+    # Filter data between two dates for the expense_category bar plot
+    df_expenses_filtered = df.loc[
+        (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
+    ]
+
+    # calculate total amount spent in the current timeframe selected
+    current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
+
+    ##################################################
+    # --- Create columns to position the metrics --- #
+    # metric1_total_amount_spent = st.columns((1))
+
+    # from the past date (start date), go back another month
+    previous_30_days = past_date - datetime.timedelta(days=30)
+
+    # Filter data between the past date and 30 days earlier.
+    # Useful to get the DELTA underneath the amount spent during the current timeframe
+    df_previous_30_days = df.loc[
+        (df["date"].dt.date >= previous_30_days) & (df["date"].dt.date < past_date)
+    ]
+
+    total_expenses_previous_30_days = round(df_previous_30_days["value"].sum(), 2)
+
+    # take the difference between the current timeframe and the previous 30 days, then show the value
+    # as a metric
+    diff_total_expenses = round(
+        current_total_expenses - total_expenses_previous_30_days, 2
+    )
+
+    # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
+    metric1_total_amount_spent.metric(
+        label="Expenses in the timeframe",
+        value=current_total_expenses,
+        delta=diff_total_expenses,
+        delta_color="inverse",
+    )
+
+    return metric_total_amount_spent
+
+
+def metric_total_amount_spent_category(df, category, today_date, past_date):
+    """
+    Function to calculate all the metrics shown in the Streamlit app.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Original dataframe
+    category : str
+        Category to filter the df with
+    today_date : str
+        "To" date. Most recent date until which you want to filter.
+    past_date : str
+        "From" date. Past date from which you want to start filtering.
+
+    Returns
+    -------
+    None
+        Return the metrics computed for each element.
+    """
+
+    ##################################################
+    # --- Create columns to position the metrics --- #
+    # metric2_total_amount_spent_category = st.columns((1))
+
+    # Filter data between two dates for the expense_category bar plot
+    df_expenses_filtered = df.loc[
+        (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
+    ]
+
+    # calculate total amount ONLY for the category selected (for the selected timeframe)
+    # try-except: if no expenses for the selected category has been found for the selected timeframe
+    # then show 0 as value for both the total_expenses_category and total_expenses_previous_30_days_category
+    try:
+        total_expenses_category = round(
+            df_expenses_filtered[df_expenses_filtered["expense_category"] == category]
+            .groupby(["expense_category"])["value"]
+            .sum(),
+            2,
+        )[0]
+    except IndexError:
+        total_expenses_category = 0
+
+    # from the past date (start date), go back another month
+    previous_30_days = past_date - datetime.timedelta(days=30)
+
+    # Filter data between the past date and 30 days earlier.
+    # Useful to get the DELTA underneath the amount spent during the current timeframe
+    df_previous_30_days = df.loc[
+        (df["date"].dt.date >= previous_30_days) & (df["date"].dt.date < past_date)
+    ]
+
+    # calculate total amount ONLY for food (for the 30 days before the "From" date)
+    # try-except: if no expenses for the selected category has been found for the selected timeframe
+    # then show 0 as value for both the total_expenses_category and total_expenses_previous_30_days_category
+    try:
+        total_expenses_previous_30_days_category = round(
+            df_previous_30_days[df_previous_30_days["expense_category"] == category]
+            .groupby(["expense_category"])["value"]
+            .sum(),
+            2,
+        )[0]
+    except IndexError:
+        total_expenses_previous_30_days_category = 0
+
+    # take the difference between the current timeframe and the previous 30 days, then show the value
+    # as a metric ONLY for the chosen category
+    diff_total_expenses_category = round(
+        total_expenses_category - total_expenses_previous_30_days_category, 2
+    )
+
+    # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
+    metric2_total_amount_spent_category.metric(
+        label=f"Expenses for {category}",
+        value=total_expenses_category,
+        delta=diff_total_expenses_category,
+        delta_color="inverse",
+    )
+
+    return metric2_total_amount_spent_category
+
 
 # set the page default setting to wide
 st.set_page_config(layout="wide")
-
 
 # sidebar
 with st.sidebar:
@@ -34,6 +174,7 @@ with st.sidebar:
 
     # separator
     st.divider()
+
     # Check if file was uploaded
     if uploaded_file:
         if uploaded_file.type == "text/csv":
@@ -56,44 +197,52 @@ with st.sidebar:
         unsafe_allow_html=False,
     )
 
-# if the uploaded_file is not None, then show the dashboard;
+# If the uploaded_file is not None, then show the dashboard;
 # otherwise show the hint to upload it.
-# sort the data by date
 if uploaded_file is not None:
     st.subheader("Select the timeframe that you want to analyze")
+    # sort the data by date
     df_expenses.sort_values(by=["date"], inplace=True)
 
     ###############################################
-    # plots
-    dt1, dt2, dt3, dt4, dt5, dt6, dt7 = st.columns((0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1))
+    # define the columns where to insert the datepicker
+    dt1, dt2, from_date, to_date, dt5, dt6, dt7 = st.columns(
+        (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
+    )
 
     # define start and end date
-    past_date = dt3.date_input("From", past, key="test1")
-    today_date = dt4.date_input("To", today, key="test2")
+    past_date = from_date.date_input("From", past, key="from_date")
+    today_date = to_date.date_input("To", today, key="to_date")
+    category_selection = st.selectbox(
+        "Select the category:", df_expenses["expense_category"].unique()
+    )
 
     ###############################################
 
-    # TODO: not easily understandable.
-    #  Filter data between two dates for the expense_category bar plot
-    df_expenses_filtered = df_expenses.loc[
+    # Filter data between two dates, "From" and "To" date
+    df_expenses_within_date_range = df_expenses.loc[
         (df_expenses["date"].dt.date >= past_date)
         & (df_expenses["date"].dt.date < today_date)
     ]
 
     # set the index using the expense_category column
-    df_expenses_filtered_for_category = df_expenses_filtered.set_index(
+    df_expenses_filtered_for_category = df_expenses_within_date_range.set_index(
         "expense_category"
     )
-    df_expenses_filtered_year_grouped = df_expenses_filtered.groupby(
+    # group by expenses and sum the value for each category
+    df_expenses_filtered_year_grouped = df_expenses_within_date_range.groupby(
         "expense_category",
     )[["value"]].sum()
 
+    # instantiate the bar chart with the expense categories
     fig_bar_chart = px.bar(
-        df_expenses_filtered.groupby("expense_category")["value"].sum().reset_index(),
+        df_expenses_within_date_range.groupby("expense_category")["value"]
+        .sum()
+        .reset_index(),
         x="expense_category",
         y="value",
         color="expense_category",
-        title="Expenses per category",
+        # title="Expenses per category",
     )
     fig_bar_chart.update_layout(
         barmode="stack", xaxis={"categoryorder": "total descending"}
@@ -114,7 +263,7 @@ if uploaded_file is not None:
     fig_bar_chart.add_trace(
         go.Scatter(
             x=x_coords,
-            # used the previous df to sort the categories as the reordered one
+            # use the previous df to sort the categories as the reordered one
             y=df_expenses_filtered_year_grouped["value"].reindex(
                 category_order_df.index
             ),
@@ -130,110 +279,54 @@ if uploaded_file is not None:
         )
     )
 
+    # instantiate the pie plot with the stores
     fig_pie_plot = px.pie(
-        df_expenses_filtered,
+        df_expenses_within_date_range,
         values="value",
         names="store",
         title="Expenses per store",
         hole=0.7,
     )
-    # update the pie plot to insert the label inside the slice
+    # Update the pie plot to insert the label inside the slice
     # and to hide those labels that are too small to be read
     fig_pie_plot.update_traces(textposition="inside")
     fig_pie_plot.update_layout(uniformtext_minsize=12, uniformtext_mode="hide")
 
-    ###################################################
+    # ###################################################
     # --- Metrics --- #
-    # calculate total amount spent in the current timeframe selected
-    current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
-    # calculate total amount ONLY for food (for the selected timeframe)
-    current_food_total_expenses = round(
-        df_expenses_filtered[df_expenses_filtered["expense_category"] == "food"]
-        .groupby(["expense_category"])["value"]
-        .sum(),
-        2,
-    )
-
-    # TODO: not easily understandable. previous_30_days from when?
-    previous_30_days = past_date - datetime.timedelta(days=30)
-
-    # Filter data between the past date and 30 days earlier.
-    # Useful to get the DELTA underneath the amount spent during the current timeframe
-    # TODO: not easily understandable.
-    df_expenses_previous_30_days = df_expenses.loc[
-        (df_expenses["date"].dt.date >= previous_30_days)
-        & (df_expenses["date"].dt.date < past_date)
-    ]
-
-    # calculate the total amount spent in the previous 30 days from past_date
-    total_expenses_previous_30_days = round(
-        df_expenses_previous_30_days["value"].sum(), 2
-    )
-
-    # take the difference between the current timeframe and the previous 30 days, then show the value
-    # as a metric
-    diff_total_expenses = round(
-        current_total_expenses - total_expenses_previous_30_days, 2
-    )
-    # calculate total amount ONLY for food (for the 30 days before the "From" date)
-    total_expenses_previous_30_days_food = round(
-        df_expenses_previous_30_days[
-            df_expenses_previous_30_days["expense_category"] == "food"
-        ]
-        .groupby(["expense_category"])["value"]
-        .sum(),
-        2,
-    )
-    # take the difference between the current timeframe and the previous 30 days, then show the value
-    # as a metric ONLY for the food category
-    diff_total_expenses_food = round(
-        current_food_total_expenses - total_expenses_previous_30_days_food, 2
-    )
-
-    ##################################################
 
     # --- Create columns to position the metrics --- #
-    metric1, metric2, metric3, metric4 = st.columns((1, 1, 1, 1))
+    (
+        metric1_total_amount_spent,
+        metric2_total_amount_spent_category,
+        metric3,
+        metric4,
+    ) = st.columns(4)
 
-    # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
-    metric1.metric(
-        label="Expenses in the timeframe",
-        value=current_total_expenses,
-        delta=diff_total_expenses,
-        delta_color="inverse",
+    metric1_total_amount_spent = metric_total_amount_spent(
+        df_expenses, today_date, past_date
+    )
+    metric2_total_amount_spent_category = metric_total_amount_spent_category(
+        df_expenses, category_selection, today_date, past_date
     )
 
-    # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
-    metric2.metric(
-        label="Expenses for food",
-        value=current_food_total_expenses,
-        delta=diff_total_expenses_food.iloc[0],
-        delta_color="inverse",
-    )
+    # # Apply the metric_computation function to create the expenses
+    # metric1, metric2, metric3, metric4 = metric_computation(
+    #     df_expenses,
+    #     today_date,
+    #     past_date,
+    # )
 
-    # --- THIS IS A COPY OF THE PREVIOUS METRIC, MUST BE CHANGED --- #
-    metric3.metric(
-        label="Expenses for food",
-        value=current_food_total_expenses,
-        delta=diff_total_expenses_food.iloc[0],
-        delta_color="inverse",
-    )
-
-    # --- THIS IS A COPY OF THE PREVIOUS METRIC, MUST BE CHANGED --- #
-    metric4.metric(
-        label="Expenses for food",
-        value=current_food_total_expenses,
-        delta=diff_total_expenses_food.iloc[0],
-        delta_color="inverse",
-    )
-
+    # ###################################################
     # --- Create columns to position the plots --- #
     # plots
     plot1, plot2, plot3 = st.columns((200, 1, 200))
+    # plot the bar category bar chart
     plot1.plotly_chart(
         fig_bar_chart,
         use_container_width=True,
     )
+    # plot the store pie plot
     plot3.plotly_chart(
         fig_pie_plot,
         use_container_width=True,
@@ -320,7 +413,6 @@ if uploaded_file is not None:
         .reset_index(name="count")
         .sort_values(by="count")
     )
-    # print(grouped_counts[grouped_counts["count"] > 7])
     grouped_counts = grouped_counts[grouped_counts["count"] > 7]
 
     # Merge the filtered dataframe with the original one on the "store" column
@@ -332,83 +424,10 @@ if uploaded_file is not None:
         how="inner",
     )
 
-    # separator
-    st.divider()
-
-    ########################################################
-    # --- Create columns to position the selection box --- #
-    selectionbox1, selectionbox2, selectionbox3, selectionbox4 = st.columns(
-        (0.8, 1, 1, 1)
-    )
-
-    # show the store options
-    option = selectionbox1.selectbox(
-        "Select the store",
-        # show me only those options related to food
-        df_expenses_size_filtering_year[
-            df_expenses_size_filtering_year["expense_category"] == "food"
-        ]
-        .sort_values(by="store", ascending=True)["store"]
-        .str.lower()
-        .unique(),
-        placeholder="Select the store...",
-    )
-
-    # filter the dataframe based on the chosen option
-    df_expenses_filtered_year_bar_plot = df_expenses_filtered_year.loc[
-        (df_expenses_filtered_year["store"] == option)
-    ]
-
-    # --- Dropdown menu to select the store for the bar plot --- #
-    # get statistics per months, using a bar plot
-    fig_bar_chart_week = px.bar(
-        df_expenses_filtered_year_bar_plot.groupby(["weekday_text"])["value"]
-        .agg(["sum"])
-        .reset_index(),
-        x="weekday_text",
-        y="sum",
-        title="Daily sum for food expenses per store",
-        category_orders={
-            "weekday_text": [
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
-                "Sunday",
-            ],
-        },
-    )
-    # Update layout
-    fig_bar_chart_week.update_layout(
-        xaxis_title="Day of the week", yaxis_title="Sum of expenses"
-    )
-
-    st.plotly_chart(
-        fig_bar_chart_week,
-        use_container_width=True,
-        sharing="streamlit",
-        theme="streamlit",
-    )
-
-    fig_bar_chart_week.update_xaxes(
-        categoryorder="array",
-        categoryarray=[
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-            "Sunday",
-        ],
-    )
-
     # --- CSS hacks --- #
-    #
     with open(r"C:\solutions\learning_python\expense_tracker\src\pkgs\style.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 
 # TODO
 # Add the following information: most expensive category, and you want to try to reduce the amount
@@ -426,11 +445,22 @@ if uploaded_file is not None:
 # in the plots.
 
 # TODO:
-# Try to move the metrics and the plots in two different files and then called them as packages in this
+# Try to move the plots in two different files and then called them as packages in this
 # main one.
 
 # TODO:
 # add the Expenses per category in % with, maybe, a radar plot (?)
+
+# TODO:
+# add a filter for all the plot to select one category and to show the expenses for that category,
+# for instance "food"
+
+# TODO:
+# move the explanation about the delta in a specific repo on github with the expense tracker code
+
+# TODO:
+# Add an example of the dataset to be downloaded with 5 rows right below the upload file
+# instead of the delta explanation
 
 else:
     st.text(
