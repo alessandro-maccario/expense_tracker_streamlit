@@ -158,6 +158,124 @@ def metric_total_amount_spent_category(df, category, today_date, past_date):
     return metric2_total_amount_spent_category
 
 
+def plot_bar_chart_category_total(df, today_date, past_date):
+    """
+    Bar chart to show all the categories availbable in a specific
+    timeframe and the total amount spent for each category
+
+    """
+
+    # Filter data between two dates, "From" and "To" date
+    df_expenses_within_date_range = df.loc[
+        (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
+    ]
+
+    # set the index using the expense_category column
+    df_expenses_filtered_for_category = df_expenses_within_date_range.set_index(
+        "expense_category"
+    )
+    # group by expenses and sum the value for each category
+    df_expenses_filtered_year_grouped = df_expenses_within_date_range.groupby(
+        "expense_category",
+    )[["value"]].sum()
+
+    # instantiate the bar chart with the expense categories
+    fig_bar_chart = px.bar(
+        df_expenses_within_date_range.groupby("expense_category")["value"]
+        .sum()
+        .reset_index(),
+        x="expense_category",
+        y="value",
+        color="expense_category",
+        # title="Expenses per category",
+    )
+    fig_bar_chart.update_layout(
+        barmode="stack", xaxis={"categoryorder": "total descending"}
+    )
+    # Update layout (optional)
+    fig_bar_chart.update_layout(
+        title="Expenses per category",
+        xaxis_title="Category",
+        yaxis_title="Expenses",
+    )
+
+    # get the list of unique element in the index
+    x_coords = list(set(df_expenses_filtered_year_grouped.index))
+
+    # Create a DataFrame with the desired order of the categories
+    category_order_df = pd.DataFrame(index=x_coords)
+
+    # fig_bar_chart.add_trace(
+    #     go.Scatter(
+    #         x=x_coords,
+    #         # use the previous df to sort the categories as the reordered one
+    #         y=df_expenses_filtered_year_grouped["value"].reindex(
+    #             category_order_df.index
+    #         ),
+    #         text=df_expenses_filtered_year_grouped["value"].reindex(
+    #             category_order_df.index
+    #         ),
+    #         mode="text",
+    #         textposition="top center",
+    #         textfont=dict(
+    #             size=11,
+    #         ),
+    #         showlegend=False,
+    #     )
+    # )
+
+    plot1 = st.plotly_chart(
+        fig_bar_chart,
+        use_container_width=True,
+    )
+
+    return plot1
+
+
+def plot_donut_chart_store_total(df, today_date, past_date):
+    """_summary_
+
+    Parameters
+    ----------
+    df : _type_
+        _description_
+    today_date : _type_
+        _description_
+    past_date : _type_
+        _description_
+    """
+
+    # Filter data between two dates, "From" and "To" date
+    df_expenses_within_date_range = df.loc[
+        (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
+    ]
+
+    # Donut chart
+    # instantiate the donut chart with the stores
+    fig_pie_plot = px.pie(
+        df_expenses_within_date_range,
+        values="value",
+        names="store",
+        title="Expenses per store",
+        hole=0.7,
+    )
+    # Update the pie plot to insert the label inside the slice
+    # and to hide those labels that are too small to be read
+    fig_pie_plot.update_traces(textposition="inside")
+    fig_pie_plot.update_layout(uniformtext_minsize=12, uniformtext_mode="hide")
+
+    # plot the pie plot for stores
+    plot2 = st.plotly_chart(
+        fig_pie_plot,
+        use_container_width=True,
+    )
+
+    return plot2
+
+
+#############################################
+#############################################
+
 # set the page default setting to wide
 st.set_page_config(layout="wide")
 
@@ -219,82 +337,82 @@ if uploaded_file is not None:
 
     ###############################################
 
-    # Filter data between two dates, "From" and "To" date
-    df_expenses_within_date_range = df_expenses.loc[
-        (df_expenses["date"].dt.date >= past_date)
-        & (df_expenses["date"].dt.date < today_date)
-    ]
+    # # Filter data between two dates, "From" and "To" date
+    # df_expenses_within_date_range = df_expenses.loc[
+    #     (df_expenses["date"].dt.date >= past_date)
+    #     & (df_expenses["date"].dt.date < today_date)
+    # ]
 
-    # set the index using the expense_category column
-    df_expenses_filtered_for_category = df_expenses_within_date_range.set_index(
-        "expense_category"
-    )
-    # group by expenses and sum the value for each category
-    df_expenses_filtered_year_grouped = df_expenses_within_date_range.groupby(
-        "expense_category",
-    )[["value"]].sum()
+    # # set the index using the expense_category column
+    # df_expenses_filtered_for_category = df_expenses_within_date_range.set_index(
+    #     "expense_category"
+    # )
+    # # group by expenses and sum the value for each category
+    # df_expenses_filtered_year_grouped = df_expenses_within_date_range.groupby(
+    #     "expense_category",
+    # )[["value"]].sum()
 
-    # instantiate the bar chart with the expense categories
-    fig_bar_chart = px.bar(
-        df_expenses_within_date_range.groupby("expense_category")["value"]
-        .sum()
-        .reset_index(),
-        x="expense_category",
-        y="value",
-        color="expense_category",
-        # title="Expenses per category",
-    )
-    fig_bar_chart.update_layout(
-        barmode="stack", xaxis={"categoryorder": "total descending"}
-    )
-    # Update layout (optional)
-    fig_bar_chart.update_layout(
-        title="Expenses per category",
-        xaxis_title="Category",
-        yaxis_title="Expenses",
-    )
+    # # instantiate the bar chart with the expense categories
+    # fig_bar_chart = px.bar(
+    #     df_expenses_within_date_range.groupby("expense_category")["value"]
+    #     .sum()
+    #     .reset_index(),
+    #     x="expense_category",
+    #     y="value",
+    #     color="expense_category",
+    #     # title="Expenses per category",
+    # )
+    # fig_bar_chart.update_layout(
+    #     barmode="stack", xaxis={"categoryorder": "total descending"}
+    # )
+    # # Update layout (optional)
+    # fig_bar_chart.update_layout(
+    #     title="Expenses per category",
+    #     xaxis_title="Category",
+    #     yaxis_title="Expenses",
+    # )
 
-    # get the list of unique element in the index
-    x_coords = list(set(df_expenses_filtered_year_grouped.index))
+    # # get the list of unique element in the index
+    # x_coords = list(set(df_expenses_filtered_year_grouped.index))
 
-    # Create a DataFrame with the desired order of the categories
-    category_order_df = pd.DataFrame(index=x_coords)
+    # # Create a DataFrame with the desired order of the categories
+    # category_order_df = pd.DataFrame(index=x_coords)
 
-    fig_bar_chart.add_trace(
-        go.Scatter(
-            x=x_coords,
-            # use the previous df to sort the categories as the reordered one
-            y=df_expenses_filtered_year_grouped["value"].reindex(
-                category_order_df.index
-            ),
-            text=df_expenses_filtered_year_grouped["value"].reindex(
-                category_order_df.index
-            ),
-            mode="text",
-            textposition="top center",
-            textfont=dict(
-                size=11,
-            ),
-            showlegend=False,
-        )
-    )
+    # # fig_bar_chart.add_trace(
+    # #     go.Scatter(
+    # #         x=x_coords,
+    # #         # use the previous df to sort the categories as the reordered one
+    # #         y=df_expenses_filtered_year_grouped["value"].reindex(
+    # #             category_order_df.index
+    # #         ),
+    # #         text=df_expenses_filtered_year_grouped["value"].reindex(
+    # #             category_order_df.index
+    # #         ),
+    # # mode="text",
+    # # textposition="top center",
+    # # textfont=dict(
+    # # size=11,
+    # # ),
+    # # showlegend=False,
+    # #     )
+    # # )
 
-    # instantiate the pie plot with the stores
-    fig_pie_plot = px.pie(
-        df_expenses_within_date_range,
-        values="value",
-        names="store",
-        title="Expenses per store",
-        hole=0.7,
-    )
-    # Update the pie plot to insert the label inside the slice
-    # and to hide those labels that are too small to be read
-    fig_pie_plot.update_traces(textposition="inside")
-    fig_pie_plot.update_layout(uniformtext_minsize=12, uniformtext_mode="hide")
+    # # Donut chart
+    # # instantiate the donut chart with the stores
+    # fig_pie_plot = px.pie(
+    #     df_expenses_within_date_range,
+    #     values="value",
+    #     names="store",
+    #     title="Expenses per store",
+    #     hole=0.7,
+    # )
+    # # Update the pie plot to insert the label inside the slice
+    # # and to hide those labels that are too small to be read
+    # fig_pie_plot.update_traces(textposition="inside")
+    # fig_pie_plot.update_layout(uniformtext_minsize=12, uniformtext_mode="hide")
 
     # ###################################################
     # --- Metrics --- #
-
     # --- Create columns to position the metrics --- #
     (
         metric1_total_amount_spent,
@@ -310,27 +428,27 @@ if uploaded_file is not None:
         df_expenses, category_selection, today_date, past_date
     )
 
-    # # Apply the metric_computation function to create the expenses
-    # metric1, metric2, metric3, metric4 = metric_computation(
-    #     df_expenses,
-    #     today_date,
-    #     past_date,
-    # )
-
     # ###################################################
-    # --- Create columns to position the plots --- #
-    # plots
-    plot1, plot2, plot3 = st.columns((200, 1, 200))
-    # plot the bar category bar chart
-    plot1.plotly_chart(
-        fig_bar_chart,
-        use_container_width=True,
-    )
-    # plot the store pie plot
-    plot3.plotly_chart(
-        fig_pie_plot,
-        use_container_width=True,
-    )
+    # --- Plots --- #
+    # Create columns to position the plots: create a container
+    data_container = st.container()
+
+    with data_container:
+        plot1, plot2 = st.columns(2)
+        with plot1:
+            plot1 = plot_bar_chart_category_total(df_expenses, today_date, past_date)
+        with plot2:
+            plot2 = plot_donut_chart_store_total(df_expenses, today_date, past_date)
+
+    # plot1.plotly_chart(
+    #     fig_bar_chart,
+    #     use_container_width=True,
+    # )
+    # # plot the pie plot for stores
+    # plot3.plotly_chart(
+    #     fig_pie_plot,
+    #     use_container_width=True,
+    # )
 
     # separator
     st.divider()
