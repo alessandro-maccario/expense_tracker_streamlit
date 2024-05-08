@@ -44,10 +44,6 @@ def metric_total_amount_spent(df, today_date, past_date):
     # calculate total amount spent in the current timeframe selected
     current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
 
-    ##################################################
-    # --- Create columns to position the metrics --- #
-    # metric1_total_amount_spent = st.columns((1))
-
     # from the past date (start date), go back another month
     previous_30_days = past_date - datetime.timedelta(days=30)
 
@@ -96,10 +92,6 @@ def metric_total_amount_spent_category(df, category, today_date, past_date):
     None
         Return the metrics computed for each element.
     """
-
-    ##################################################
-    # --- Create columns to position the metrics --- #
-    # metric2_total_amount_spent_category = st.columns((1))
 
     # Filter data between two dates for the expense_category bar plot
     df_expenses_filtered = df.loc[
@@ -233,16 +225,18 @@ def plot_bar_chart_category_total(df, today_date, past_date):
 
 
 def plot_donut_chart_store_total(df, today_date, past_date):
-    """_summary_
+    """
+        Plot a donut chart with the percentage of expenses for each
+        store in the timeframe selected.
 
     Parameters
     ----------
-    df : _type_
+    df : pd.DataFrame
         _description_
-    today_date : _type_
-        _description_
-    past_date : _type_
-        _description_
+    today_date : str
+        The current date (the "To" date)
+    past_date : str
+        The previous date (the "From" date)
     """
 
     # Filter data between two dates, "From" and "To" date
@@ -273,8 +267,71 @@ def plot_donut_chart_store_total(df, today_date, past_date):
     return plot2
 
 
-#############################################
-#############################################
+# TODO:
+# Add the possibility to choose between sum or median
+def plot_bar_chart_expenses_per_month(df, year):
+    """
+        Bar plot that shows the sum of the expenses for the year selected
+        considering the total number of months in the plot.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Original dataframe of the expeses.
+    year : str
+        Year that has been selected by the user.
+
+    Returns
+    -------
+    None
+        Return the plot to be displayed.
+    """
+
+    #  Filter data for year
+    df_expenses_filtered_year = df.loc[(df["year"] == int(year))]
+    # filter the df out using the "choose_year" filter for the year
+    df_expenses_subdf_by_month_per_year = df[df["year"] == year]
+    # get only the month and the values
+    df_expenses_subdf_by_month = df_expenses_subdf_by_month_per_year[["month", "value"]]
+    # take the average daily expenses per month
+    monthly_sum_values = df_expenses_subdf_by_month.groupby(["month"]).sum()
+
+    # get statistics per months, using a bar plot
+    fig_bar_chart_months = px.bar(
+        df_expenses_filtered_year.groupby(["expense_category", "month"])["value"]
+        .sum()
+        .reset_index(),
+        x="month",
+        y="value",
+        color="expense_category",
+    )
+    # Plot the average expenses per month
+    fig_bar_chart_months.add_trace(
+        go.Scatter(
+            x=monthly_sum_values.index,
+            y=monthly_sum_values["value"],
+            mode="lines",
+            name="Sum per month",
+            line=dict(color="#FF0000"),
+        )
+    )
+    # Update layout
+    fig_bar_chart_months.update_layout(
+        title="Expenses per Month", xaxis_title="Months", yaxis_title="Expenses"
+    )
+
+    # plot the actual graph
+    plot3 = st.plotly_chart(
+        fig_bar_chart_months,
+        use_container_width=True,
+        sharing="streamlit",
+        theme="streamlit",
+    )
+
+    return plot3
+
+
+# --- Main code --- #
 
 # set the page default setting to wide
 st.set_page_config(layout="wide")
@@ -335,82 +392,6 @@ if uploaded_file is not None:
         "Select the category:", df_expenses["expense_category"].unique()
     )
 
-    ###############################################
-
-    # # Filter data between two dates, "From" and "To" date
-    # df_expenses_within_date_range = df_expenses.loc[
-    #     (df_expenses["date"].dt.date >= past_date)
-    #     & (df_expenses["date"].dt.date < today_date)
-    # ]
-
-    # # set the index using the expense_category column
-    # df_expenses_filtered_for_category = df_expenses_within_date_range.set_index(
-    #     "expense_category"
-    # )
-    # # group by expenses and sum the value for each category
-    # df_expenses_filtered_year_grouped = df_expenses_within_date_range.groupby(
-    #     "expense_category",
-    # )[["value"]].sum()
-
-    # # instantiate the bar chart with the expense categories
-    # fig_bar_chart = px.bar(
-    #     df_expenses_within_date_range.groupby("expense_category")["value"]
-    #     .sum()
-    #     .reset_index(),
-    #     x="expense_category",
-    #     y="value",
-    #     color="expense_category",
-    #     # title="Expenses per category",
-    # )
-    # fig_bar_chart.update_layout(
-    #     barmode="stack", xaxis={"categoryorder": "total descending"}
-    # )
-    # # Update layout (optional)
-    # fig_bar_chart.update_layout(
-    #     title="Expenses per category",
-    #     xaxis_title="Category",
-    #     yaxis_title="Expenses",
-    # )
-
-    # # get the list of unique element in the index
-    # x_coords = list(set(df_expenses_filtered_year_grouped.index))
-
-    # # Create a DataFrame with the desired order of the categories
-    # category_order_df = pd.DataFrame(index=x_coords)
-
-    # # fig_bar_chart.add_trace(
-    # #     go.Scatter(
-    # #         x=x_coords,
-    # #         # use the previous df to sort the categories as the reordered one
-    # #         y=df_expenses_filtered_year_grouped["value"].reindex(
-    # #             category_order_df.index
-    # #         ),
-    # #         text=df_expenses_filtered_year_grouped["value"].reindex(
-    # #             category_order_df.index
-    # #         ),
-    # # mode="text",
-    # # textposition="top center",
-    # # textfont=dict(
-    # # size=11,
-    # # ),
-    # # showlegend=False,
-    # #     )
-    # # )
-
-    # # Donut chart
-    # # instantiate the donut chart with the stores
-    # fig_pie_plot = px.pie(
-    #     df_expenses_within_date_range,
-    #     values="value",
-    #     names="store",
-    #     title="Expenses per store",
-    #     hole=0.7,
-    # )
-    # # Update the pie plot to insert the label inside the slice
-    # # and to hide those labels that are too small to be read
-    # fig_pie_plot.update_traces(textposition="inside")
-    # fig_pie_plot.update_layout(uniformtext_minsize=12, uniformtext_mode="hide")
-
     # ###################################################
     # --- Metrics --- #
     # --- Create columns to position the metrics --- #
@@ -440,20 +421,11 @@ if uploaded_file is not None:
         with plot2:
             plot2 = plot_donut_chart_store_total(df_expenses, today_date, past_date)
 
-    # plot1.plotly_chart(
-    #     fig_bar_chart,
-    #     use_container_width=True,
-    # )
-    # # plot the pie plot for stores
-    # plot3.plotly_chart(
-    #     fig_pie_plot,
-    #     use_container_width=True,
-    # )
-
     # separator
     st.divider()
 
     ########################################################
+    # --- Bar plot per year and months --- #
     # --- Create columns to position the selection box --- #
     (
         selectionbox_barplot1,
@@ -462,90 +434,21 @@ if uploaded_file is not None:
         selectionbox_barplot4,
     ) = st.columns((0.5, 1, 1, 1))
 
-    # select the year to filter out
+    # selection box for letting the user filter the year
     choose_year = selectionbox_barplot1.selectbox(
         "Choose the year",
         df_expenses["year"].unique(),
     )
 
-    ########################################################
-
-    #  Filter data for year
-    df_expenses_filtered_year = df_expenses.loc[
-        (df_expenses["year"] == int(choose_year))
-    ]
-    # filter the df out using the "choose_year" filter for the year
-    df_expenses_subdf_by_month_per_year = df_expenses[
-        df_expenses["year"] == choose_year
-    ]
-    # get only the month and the values
-    df_expenses_subdf_by_month = df_expenses_subdf_by_month_per_year[["month", "value"]]
-    # take the average daily expenses per month
-    monthly_sum_values = df_expenses_subdf_by_month.groupby(["month"]).sum()
-
-    # get statistics per months, using a bar plot
-    fig_bar_chart_months = px.bar(
-        df_expenses_filtered_year.groupby(["expense_category", "month"])["value"]
-        .sum()
-        .reset_index(),
-        x="month",
-        y="value",
-        color="expense_category",
-    )
-    # Plot the average expenses per month
-    fig_bar_chart_months.add_trace(
-        go.Scatter(
-            x=monthly_sum_values.index,
-            y=monthly_sum_values["value"],
-            mode="lines",
-            name="Sum per month",
-            line=dict(color="#FF0000"),
-        )
-    )
-    # Update layout
-    fig_bar_chart_months.update_layout(
-        title="Expenses per Month", xaxis_title="Months", yaxis_title="Expenses"
-    )
-
-    st.plotly_chart(
-        fig_bar_chart_months,
-        use_container_width=True,
-        sharing="streamlit",
-        theme="streamlit",
-    )
-
-    # filter the data to keep only those rows where there are multiple days considered
-    # (filter out all those data that shows only one day purchase - filter out outliers)
-
-    # Group by "store" and count the number of how many times a store appears in the data
-    # If it appears only one, then it has been only a one-time purchase, not useful
-    # for showing statistics about it.
-
-    # Filter out rows where the number of unique store appearance more than 7 related to "food" category
-    grouped_counts = (
-        df_expenses_filtered_year[
-            df_expenses_filtered_year["expense_category"] == "food"
-        ]
-        .groupby(["store"])
-        .size()
-        .reset_index(name="count")
-        .sort_values(by="count")
-    )
-    grouped_counts = grouped_counts[grouped_counts["count"] > 7]
-
-    # Merge the filtered dataframe with the original one on the "store" column
-    # therefore you will get only those stores that appear in the data more than
-    # 7 times.
-    df_expenses_size_filtering_year = df_expenses_filtered_year.merge(
-        grouped_counts[["store"]],
-        on=["store"],
-        how="inner",
-    )
+    plot3 = plot_bar_chart_expenses_per_month(df_expenses, choose_year)
 
     # --- CSS hacks --- #
     with open(r"C:\solutions\learning_python\expense_tracker\src\pkgs\style.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+
+# TODO:
+# Check again the "Expenses in the timeframe" metric, something is not completely right.
 
 # TODO
 # Add the following information: most expensive category, and you want to try to reduce the amount
