@@ -14,3 +14,7 @@ KEEP READING THIS:
 TO ANSWER HERE: 
 - What your application does?
 - Why you used the technologies you used,
+
+### Dashboard explanation
+The **delta** value underneath the metrics, shows the current total minus the last 30 days expenses 
+compare to the 'From' day. If negative, you spent less (green); if positive you spent more (red).
