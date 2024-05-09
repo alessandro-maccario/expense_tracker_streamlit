@@ -40,9 +40,11 @@ def metric_total_amount_spent(df, today_date, past_date):
     df_expenses_filtered = df.loc[
         (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
     ]
+    print(max(df_expenses_filtered["date"]))
 
     # calculate total amount spent in the current timeframe selected
     current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
+    # print(current_total_expenses)
 
     # from the past date (start date), go back another month
     previous_30_days = past_date - datetime.timedelta(days=30)
@@ -95,21 +97,16 @@ def metric_total_amount_spent_category(df, category, today_date, past_date):
 
     # Filter data between two dates for the expense_category bar plot
     df_expenses_filtered = df.loc[
-        (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
+        (df["date"].dt.date >= past_date) & (df["date"].dt.date <= today_date)
     ]
 
     # calculate total amount ONLY for the category selected (for the selected timeframe)
-    # try-except: if no expenses for the selected category has been found for the selected timeframe
-    # then show 0 as value for both the total_expenses_category and total_expenses_previous_30_days_category
-    try:
-        total_expenses_category = round(
-            df_expenses_filtered[df_expenses_filtered["expense_category"] == category]
-            .groupby(["expense_category"])["value"]
-            .sum(),
-            2,
-        )[0]
-    except IndexError:
-        total_expenses_category = 0
+    total_expenses_category = round(
+        df_expenses_filtered[df_expenses_filtered["expense_category"] == category]
+        .groupby(["expense_category"])["value"]
+        .sum(),
+        2,
+    )[0]
 
     # from the past date (start date), go back another month
     previous_30_days = past_date - datetime.timedelta(days=30)
@@ -117,7 +114,7 @@ def metric_total_amount_spent_category(df, category, today_date, past_date):
     # Filter data between the past date and 30 days earlier.
     # Useful to get the DELTA underneath the amount spent during the current timeframe
     df_previous_30_days = df.loc[
-        (df["date"].dt.date >= previous_30_days) & (df["date"].dt.date < past_date)
+        (df["date"].dt.date >= previous_30_days) & (df["date"].dt.date <= past_date)
     ]
 
     # calculate total amount ONLY for food (for the 30 days before the "From" date)
@@ -317,7 +314,7 @@ def plot_bar_chart_expenses_per_month(df, year):
     )
     # Update layout
     fig_bar_chart_months.update_layout(
-        title="Expenses per Month", xaxis_title="Months", yaxis_title="Expenses"
+        title="Expenses per Month", xaxis_title="Months", yaxis_title="Sum of Expenses"
     )
 
     # plot the actual graph
@@ -365,12 +362,22 @@ with st.sidebar:
                 converters={"date": pd.to_datetime},
             )
 
-    # define a comment for the delta value underneath the metrics
-    st.markdown(
-        """The delta value underneath the metrics, shows the current total minus the last 30 days expenses 
-        compare to the 'From' day. If negative, you spent less (green); if positive you spent more (red).""",
-        unsafe_allow_html=False,
+    # adding a download button to download sample of the data in a csv file
+    st.download_button(
+        label=r"Download sample data as CSV",
+        data=r"C:\solutions\learning_python\expense_tracker\data\data_example.csv",
+        file_name="sample_data.csv",
+        mime="text/csv",
     )
+
+    # Github Badge with link to your Github profile
+    # Linkedin Badge with link to your Linkedin profile
+    """
+        [![Repo](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/alessandro-maccario) 
+        [![Repo](https://badgen.net/badge/icon/Linkedin?icon=linkedin&label)](https://www.linkedin.com/in/alessandro-maccario-7b173377/) 
+
+    """
+    st.markdown("<br>", unsafe_allow_html=True)
 
 # If the uploaded_file is not None, then show the dashboard;
 # otherwise show the hint to upload it.
@@ -388,8 +395,27 @@ if uploaded_file is not None:
     # define start and end date
     past_date = from_date.date_input("From", past, key="from_date")
     today_date = to_date.date_input("To", today, key="to_date")
+
+    # define the categories that show some values in it (exclude those categories that are
+    # empty with no value). Sort the list from higher to lower sum of expenses.
+    # Get only those categories avalailable in the specific timeframe.
+    df_expenses_filtered_categories = df_expenses.loc[
+        (df_expenses["date"].dt.date >= past_date)
+        & (df_expenses["date"].dt.date < today_date)
+    ]
+    categories_with_data = (
+        round(
+            df_expenses_filtered_categories.groupby(["expense_category"])[
+                "value"
+            ].sum(),
+            2,
+        )
+    ).sort_values(ascending=False)
+    print(categories_with_data)
+
+    # let the user select the category
     category_selection = st.selectbox(
-        "Select the category:", df_expenses["expense_category"].unique()
+        "Select the category:", categories_with_data.index.unique()
     )
 
     # ###################################################
@@ -482,6 +508,9 @@ if uploaded_file is not None:
 # TODO:
 # Add an example of the dataset to be downloaded with 5 rows right below the upload file
 # instead of the delta explanation
+
+# TODO:
+# Convert months name from integers to actual month names
 
 else:
     st.text(
