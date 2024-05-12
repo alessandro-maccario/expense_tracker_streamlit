@@ -8,7 +8,7 @@
 import datetime
 import pandas as pd
 import streamlit as st
-
+from io import BytesIO
 from pkgs.global_vars import today, past
 import plotly.express as px
 import plotly.graph_objects as go
@@ -17,7 +17,9 @@ import plotly.graph_objects as go
 # --- Metric functions --- #
 
 
-def metric_total_amount_spent(df, today_date, past_date):
+def metric_total_amount_spent(
+    df: pd.DataFrame, today_date: str, past_date: str
+) -> None:
     """
     Function to calculate the total amount spent in a specific timeframe.
 
@@ -74,7 +76,9 @@ def metric_total_amount_spent(df, today_date, past_date):
     return metric_total_amount_spent
 
 
-def metric_total_amount_spent_category(df, category, today_date, past_date):
+def metric_total_amount_spent_category(
+    df: pd.DataFrame, category: str, today_date: str, past_date: str
+) -> None:
     """
     Function to calculate all the metrics shown in the Streamlit app.
 
@@ -147,7 +151,9 @@ def metric_total_amount_spent_category(df, category, today_date, past_date):
     return metric2_total_amount_spent_category
 
 
-def plot_bar_chart_category_total(df, today_date, past_date):
+def plot_bar_chart_category_total(
+    df: pd.DataFrame, today_date: str, past_date: str
+) -> None:
     """
     Bar chart to show all the categories availbable in a specific
     timeframe and the total amount spent for each category
@@ -221,7 +227,9 @@ def plot_bar_chart_category_total(df, today_date, past_date):
     return plot1
 
 
-def plot_donut_chart_store_total(df, today_date, past_date):
+def plot_donut_chart_store_total(
+    df: pd.DataFrame, today_date: str, past_date: str
+) -> None:
     """
         Plot a donut chart with the percentage of expenses for each
         store in the timeframe selected.
@@ -266,7 +274,7 @@ def plot_donut_chart_store_total(df, today_date, past_date):
 
 # TODO:
 # Add the possibility to choose between sum or median
-def plot_bar_chart_expenses_per_month(df, year):
+def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str) -> None:
     """
         Bar plot that shows the sum of the expenses for the year selected
         considering the total number of months in the plot.
@@ -328,6 +336,12 @@ def plot_bar_chart_expenses_per_month(df, year):
     return plot3
 
 
+# REQUIRED by Streamlit: define a function to convert the sample data
+# before using it into the download button.
+def convert_df(df: pd.DataFrame) -> pd.DataFrame:
+    return df.to_csv(sep=";", index=False).encode("utf-8")
+
+
 # --- Main code --- #
 
 # set the page default setting to wide
@@ -363,9 +377,16 @@ with st.sidebar:
             )
 
     # adding a download button to download sample of the data in a csv file
+    data_example_df = pd.read_csv(
+        r"C:\solutions\learning_python\expense_tracker\data\data_example.csv", sep=";"
+    )
+    # convert the dataframe to be sent to the donwload button
+    data_example_encoded = convert_df(data_example_df)
+
+    # add a download button for downloading the sample data
     st.download_button(
         label=r"Download sample data as CSV",
-        data=r"C:\solutions\learning_python\expense_tracker\data\data_example.csv",
+        data=data_example_encoded,
         file_name="sample_data.csv",
         mime="text/csv",
     )
@@ -473,9 +494,6 @@ if uploaded_file is not None:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
-# TODO:
-# Check again the "Expenses in the timeframe" metric, something is not completely right.
-
 # TODO
 # Add the following information: most expensive category, and you want to try to reduce the amount
 # spent, for instance on food. Therefore you set a limit of 5/10% of saving on food each month.
@@ -492,25 +510,14 @@ if uploaded_file is not None:
 # in the plots.
 
 # TODO:
-# Try to move the plots in two different files and then called them as packages in this
-# main one.
-
-# TODO:
 # add the Expenses per category in % with, maybe, a radar plot (?)
 
 # TODO:
-# add a filter for all the plot to select one category and to show the expenses for that category,
-# for instance "food"
-
-# TODO:
-# move the explanation about the delta in a specific repo on github with the expense tracker code
-
-# TODO:
-# Add an example of the dataset to be downloaded with 5 rows right below the upload file
-# instead of the delta explanation
-
-# TODO:
 # Convert months name from integers to actual month names
+
+# TODO:
+# Continue with the README:
+# https://github.com/alessandro-maccario/expense_tracker_streamlit/blob/main/README.md
 
 else:
     st.text(
