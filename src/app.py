@@ -409,8 +409,8 @@ if uploaded_file is not None:
 
     ###############################################
     # define the columns where to insert the datepicker
-    dt1, dt2, from_date, to_date, dt5, dt6, dt7 = st.columns(
-        (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
+    dt1, dt2, from_date, to_date, category_sel, dt6, dt7 = st.columns(
+        (0.1, 0.1, 0.12, 0.12, 0.15, 0.1, 0.1)
     )
 
     # define start and end date
@@ -432,10 +432,9 @@ if uploaded_file is not None:
             2,
         )
     ).sort_values(ascending=False)
-    print(categories_with_data)
 
     # let the user select the category
-    category_selection = st.selectbox(
+    category_selection = category_sel.selectbox(
         "Select the category:", categories_with_data.index.unique()
     )
 
