@@ -17,6 +17,88 @@ import plotly.graph_objects as go
 # --- Metric functions --- #
 
 
+def monthly_report_metric_total_amount_spent(
+    df: pd.DataFrame, year: str, month: str
+) -> None:
+    """
+    Function to calculate the total amount spent in a specific timeframe.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Original dataframe
+    year : str
+        The user selects a year with which the dataframe is filtered.
+    past_date : str
+        The user selects a month with which the dataframe is filtered.
+
+    Returns
+    -------
+    None
+        Return the metrics computed for the metric to be displayed.
+    """
+
+    # Filter data between two dates for the expense_category bar plot
+    df_expenses_filtered = df.loc[(df["year"] == year) & (df["month"] == month)]
+    print(max(df_expenses_filtered["year"]))
+    print(max(df_expenses_filtered["month"]))
+
+    # calculate total amount spent in the current timeframe selected
+    current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
+
+    # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
+    monthly_report_metric1 = st.metric(
+        label="Monthly Report - Total",
+        value=current_total_expenses,
+    )
+
+    return monthly_report_metric1
+
+
+def monthly_report_plot1(df: pd.DataFrame, year: str, month: str) -> None:
+    """_summary_
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Original dataframe to be sliced.
+    year : str
+        Year selected by the user.
+    month : str
+        Month selected by the user.
+
+    Returns
+    -------
+    None
+        Stacked bar chart will be returned.
+    """
+    # filter the df based on the selection of the user
+    df_monthly_report_choose_year = df_expenses[df_expenses["year"] == year]
+
+    # filter the df based on the selection of the user
+    df_monthly_report_choose_month = df_monthly_report_choose_year[
+        df_monthly_report_choose_year["month"] == month
+    ]
+
+    # instantiate the bar chart with the expense categories
+    fig_bar_chart_monthly_report_plot1 = px.histogram(
+        df_monthly_report_choose_month,
+        x="month",
+        y="value",
+        color="expense_category",
+        barnorm="percent",
+        text_auto=".2f",
+    )
+
+    # plot
+    plot1 = st.plotly_chart(
+        fig_bar_chart_monthly_report_plot1,
+        use_container_width=True,
+    )
+
+    return plot1
+
+
 def metric_total_amount_spent(
     df: pd.DataFrame, today_date: str, past_date: str
 ) -> None:
@@ -182,7 +264,6 @@ def plot_bar_chart_category_total(
         x="expense_category",
         y="value",
         color="expense_category",
-        # title="Expenses per category",
     )
     fig_bar_chart.update_layout(
         barmode="stack", xaxis={"categoryorder": "total descending"}
@@ -200,25 +281,7 @@ def plot_bar_chart_category_total(
     # Create a DataFrame with the desired order of the categories
     category_order_df = pd.DataFrame(index=x_coords)
 
-    # fig_bar_chart.add_trace(
-    #     go.Scatter(
-    #         x=x_coords,
-    #         # use the previous df to sort the categories as the reordered one
-    #         y=df_expenses_filtered_year_grouped["value"].reindex(
-    #             category_order_df.index
-    #         ),
-    #         text=df_expenses_filtered_year_grouped["value"].reindex(
-    #             category_order_df.index
-    #         ),
-    #         mode="text",
-    #         textposition="top center",
-    #         textfont=dict(
-    #             size=11,
-    #         ),
-    #         showlegend=False,
-    #     )
-    # )
-
+    # plot
     plot1 = st.plotly_chart(
         fig_bar_chart,
         use_container_width=True,
@@ -272,8 +335,6 @@ def plot_donut_chart_store_total(
     return plot2
 
 
-# TODO:
-# Add the possibility to choose between sum or median
 def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str) -> None:
     """
         Bar plot that shows the sum of the expenses for the year selected
@@ -297,16 +358,19 @@ def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str) -> None:
     # filter the df out using the "choose_year" filter for the year
     df_expenses_subdf_by_month_per_year = df[df["year"] == year]
     # get only the month and the values
-    df_expenses_subdf_by_month = df_expenses_subdf_by_month_per_year[["month", "value"]]
+    df_expenses_subdf_by_month = df_expenses_subdf_by_month_per_year[
+        ["months_text", "value"]
+    ]
+
     # take the average daily expenses per month
-    monthly_sum_values = df_expenses_subdf_by_month.groupby(["month"]).sum()
+    monthly_sum_values = df_expenses_subdf_by_month.groupby(["months_text"]).sum()
 
     # get statistics per months, using a bar plot
     fig_bar_chart_months = px.bar(
-        df_expenses_filtered_year.groupby(["expense_category", "month"])["value"]
+        df_expenses_filtered_year.groupby(["expense_category", "months_text"])["value"]
         .sum()
         .reset_index(),
-        x="month",
+        x="months_text",
         y="value",
         color="expense_category",
     )
@@ -315,14 +379,38 @@ def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str) -> None:
         go.Scatter(
             x=monthly_sum_values.index,
             y=monthly_sum_values["value"],
-            mode="lines",
+            mode="text",
+            textposition="top center",
+            text=round(monthly_sum_values["value"], 2),
+            textfont=dict(
+                color="black",
+                size=15,
+            ),
             name="Sum per month",
-            line=dict(color="#FF0000"),
         )
     )
     # Update layout
     fig_bar_chart_months.update_layout(
         title="Expenses per Month", xaxis_title="Months", yaxis_title="Sum of Expenses"
+    )
+
+    # reorder the months for the barplot
+    fig_bar_chart_months.update_xaxes(
+        categoryorder="array",
+        categoryarray=[
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+        ],
     )
 
     # plot the actual graph
@@ -336,8 +424,8 @@ def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str) -> None:
     return plot3
 
 
-# REQUIRED by Streamlit: define a function to convert the sample data
-# before using it into the download button.
+# REQUIRED by Streamlit for donwloading the data in the correct format:
+# define a function to convert the sample data before using it into the download button.
 def convert_df(df: pd.DataFrame) -> pd.DataFrame:
     return df.to_csv(sep=";", index=False).encode("utf-8")
 
@@ -403,7 +491,6 @@ with st.sidebar:
 # If the uploaded_file is not None, then show the dashboard;
 # otherwise show the hint to upload it.
 if uploaded_file is not None:
-    st.subheader("Select the timeframe that you want to analyze")
     # sort the data by date
     df_expenses.sort_values(by=["date"], inplace=True)
 
@@ -488,31 +575,84 @@ if uploaded_file is not None:
 
     plot3 = plot_bar_chart_expenses_per_month(df_expenses, choose_year)
 
+    # separator
+    st.divider()
+
+    #####################################
+    # --- Monthly report comparison --- #
+    #####################################
+    # TODO:
+    # Convert later on into a function!
+
+    # Create columns to place the two plots
+    # --- Create columns to position the selection box --- #
+
+    # Create columns to position the plots: create a container
+    monthly_report_data_container = st.container()
+
+    # TODO:
+    # add the difference between the other month as the delta value
+    # underneath the metric, so it's cleaner.
+    with monthly_report_data_container:
+        # left side and right side of the screen
+        (
+            monthly_report_metric_plot_left_side,
+            monthly_report_metric_plot_right_side,
+        ) = st.columns(2)
+        with monthly_report_metric_plot_left_side:
+            # selection box for letting the user filter the year
+            monthly_report_choose_year = st.selectbox(
+                "Monthly Report - Year",
+                df_expenses["year"].unique(),
+            )
+            # filter the df based on the selection of the user
+            df_monthly_report_choose_year = df_expenses[
+                df_expenses["year"] == monthly_report_choose_year
+            ]
+            # selection box for letting the user filter the month
+            monthly_report_choose_month = st.selectbox(
+                "Monthly Report - Month",
+                df_monthly_report_choose_year["month"].unique(),
+            )
+
+            # display the monthly report metric1
+            monthly_report_metric_total_amount_spent(
+                df_expenses, monthly_report_choose_year, monthly_report_choose_month
+            )
+
+            # display the plot the stacked bar chart
+            monthly_report_plot1(
+                df_expenses, monthly_report_choose_year, monthly_report_choose_month
+            )
+        with monthly_report_metric_plot_right_side:
+            # selection box for letting the user filter the year
+            monthly_report_choose_year_2 = st.selectbox(
+                "Monthly Report - Year 2",
+                df_expenses["year"].unique(),
+            )
+            # filter the df based on the selection of the user
+            df_monthly_report_choose_year_2 = df_expenses[
+                df_expenses["year"] == monthly_report_choose_year_2
+            ]
+            # selection box for letting the user filter the month
+            monthly_report_choose_month_2 = st.selectbox(
+                "Monthly Report - Month 2",
+                df_monthly_report_choose_year_2["month"].unique(),
+            )
+
+            # display the monthly report metric1
+            monthly_report_metric_total_amount_spent(
+                df_expenses, monthly_report_choose_year_2, monthly_report_choose_month_2
+            )
+
+            # display the plot the stacked bar chart
+            monthly_report_plot1(
+                df_expenses, monthly_report_choose_year_2, monthly_report_choose_month_2
+            )
+
     # --- CSS hacks --- #
     with open(r"C:\solutions\learning_python\expense_tracker\src\pkgs\style.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-
-# TODO
-# Add the following information: most expensive category, and you want to try to reduce the amount
-# spent, for instance on food. Therefore you set a limit of 5/10% of saving on food each month.
-# You also need another metric that tells you: how much you spent on food compare to the previous
-# month (literally, taken from the month before), how much you saved so far (for instance, after
-# a few months later) and how far you are in reaching your goal (if the goal is reaching 500€ per year
-# saved, then you can show how much you already saved and how much you still need to reach the goal)!
-# You should also record this data, but you have to think how.
-
-# TODO:
-# Create the database to stop using the csv file. In the future, record the data directly in
-# the DB. In order to do that, you should have another page connected to your db in streamlit that
-# gives you the possibility to record the expenses and directly see the results of your new data directly
-# in the plots.
-
-# TODO:
-# add the Expenses per category in % with, maybe, a radar plot (?)
-
-# TODO:
-# Convert months name from integers to actual month names
 
 # TODO:
 # Continue with the README:
@@ -520,5 +660,5 @@ if uploaded_file is not None:
 
 else:
     st.text(
-        "To start the dashboard please, upload a file using the button on the sidebar."
+        "To start the dashboard, please, upload a file using the button on the sidebar."
     )
