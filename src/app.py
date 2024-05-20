@@ -34,28 +34,66 @@ def monthly_report_metric_total_amount_spent(
 
     Returns
     -------
+    current_total_expenses: float
+        Actual total value of the expenses for the month selected
     None
         Return the metrics computed for the metric to be displayed.
     """
 
     # Filter data between two dates for the expense_category bar plot
     df_expenses_filtered = df.loc[(df["year"] == year) & (df["month"] == month)]
-    print(max(df_expenses_filtered["year"]))
-    print(max(df_expenses_filtered["month"]))
 
     # calculate total amount spent in the current timeframe selected
     current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
 
     # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
-    monthly_report_metric1 = st.metric(
+    monthly_report_metric1 = monthly_report_metric_left_side.metric(
         label="Monthly Report - Total",
         value=current_total_expenses,
     )
 
-    return monthly_report_metric1
+    return current_total_expenses, monthly_report_metric1
 
 
-def monthly_report_plot1(df: pd.DataFrame, year: str, month: str) -> None:
+def monthly_report_right_metric_total_amount_spent(
+    df: pd.DataFrame, year: str, month: str
+) -> None:
+    """
+    Function to calculate the total amount spent in a specific timeframe.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Original dataframe
+    year : str
+        The user selects a year with which the dataframe is filtered.
+    past_date : str
+        The user selects a month with which the dataframe is filtered.
+
+    Returns
+    -------
+    current_total_expenses: float
+        Actual total value of the expenses for the month selected
+    None
+        Return the metrics computed for the metric to be displayed.
+    """
+
+    # Filter data between two dates for the expense_category bar plot
+    df_expenses_filtered = df.loc[(df["year"] == year) & (df["month"] == month)]
+
+    # calculate total amount spent in the current timeframe selected
+    current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
+
+    # --- Metric that shows the total amount spent in the timeframe selected --- #
+    monthly_report_metric1 = monthly_report_metric_right_side.metric(
+        label="Monthly Report - Total",
+        value=current_total_expenses,
+    )
+
+    return current_total_expenses, monthly_report_metric1
+
+
+def monthly_report_plot(df: pd.DataFrame, year: str, month: str, side: str) -> None:
     """_summary_
 
     Parameters
@@ -66,6 +104,8 @@ def monthly_report_plot1(df: pd.DataFrame, year: str, month: str) -> None:
         Year selected by the user.
     month : str
         Month selected by the user.
+    side : str
+        The side in which the plot should be inserted based on the container created.
 
     Returns
     -------
@@ -81,18 +121,24 @@ def monthly_report_plot1(df: pd.DataFrame, year: str, month: str) -> None:
     ]
 
     # instantiate the bar chart with the expense categories
-    fig_bar_chart_monthly_report_plot1 = px.histogram(
+    fig_bar_chart_monthly_report_plot = px.histogram(
         df_monthly_report_choose_month,
-        x="month",
+        x="months_text",
         y="value",
         color="expense_category",
         barnorm="percent",
         text_auto=".2f",
     )
+    # Update layout (optional)
+    fig_bar_chart_monthly_report_plot.update_layout(
+        title="Expenses per category",
+        xaxis_title="Month",
+        yaxis_title="Total amount spent - %",
+    )
 
     # plot
-    plot1 = st.plotly_chart(
-        fig_bar_chart_monthly_report_plot1,
+    plot1 = side.plotly_chart(
+        fig_bar_chart_monthly_report_plot,
         use_container_width=True,
     )
 
@@ -587,8 +633,12 @@ if uploaded_file is not None:
     # Create columns to place the two plots
     # --- Create columns to position the selection box --- #
 
+    # TODO:
+    # rename these container accordingly based on the values that they contain
     # Create columns to position the plots: create a container
     monthly_report_data_container = st.container()
+    monthly_report_data_container_metrics = st.container()
+    monthly_report_data_container_plots = st.container()
 
     # TODO:
     # add the difference between the other month as the delta value
@@ -614,16 +664,6 @@ if uploaded_file is not None:
                 "Monthly Report - Month",
                 df_monthly_report_choose_year["month"].unique(),
             )
-
-            # display the monthly report metric1
-            monthly_report_metric_total_amount_spent(
-                df_expenses, monthly_report_choose_year, monthly_report_choose_month
-            )
-
-            # display the plot the stacked bar chart
-            monthly_report_plot1(
-                df_expenses, monthly_report_choose_year, monthly_report_choose_month
-            )
         with monthly_report_metric_plot_right_side:
             # selection box for letting the user filter the year
             monthly_report_choose_year_2 = st.selectbox(
@@ -639,15 +679,62 @@ if uploaded_file is not None:
                 "Monthly Report - Month 2",
                 df_monthly_report_choose_year_2["month"].unique(),
             )
+        with monthly_report_data_container_metrics:
+            # left side and right side of the screen
+            (
+                monthly_report_metric_left_side,
+                monthly_report_metric_middle_side,
+                monthly_report_metric_right_side,
+            ) = st.columns((0.8, 0.6, 0.8))
 
             # display the monthly report metric1
-            monthly_report_metric_total_amount_spent(
-                df_expenses, monthly_report_choose_year_2, monthly_report_choose_month_2
+            monthly_report_total_expenses_metric_1, monthly_report_metric1 = (
+                monthly_report_metric_total_amount_spent(
+                    df_expenses, monthly_report_choose_year, monthly_report_choose_month
+                )
             )
 
-            # display the plot the stacked bar chart
-            monthly_report_plot1(
-                df_expenses, monthly_report_choose_year_2, monthly_report_choose_month_2
+            # display the monthly report metric2
+            monthly_report_total_expenses_metric_2, monthly_report_metric2 = (
+                monthly_report_right_metric_total_amount_spent(
+                    df_expenses,
+                    monthly_report_choose_year_2,
+                    monthly_report_choose_month_2,
+                )
+            )
+
+            diff_metric1_metric2 = round(
+                monthly_report_total_expenses_metric_2
+                - monthly_report_total_expenses_metric_1,
+                2,
+            )
+
+            # set the metric of the difference in the center
+            monthly_report_metric1 = monthly_report_metric_middle_side.metric(
+                label="Monthly Report - Total Difference",
+                value=diff_metric1_metric2,
+            )
+        with monthly_report_data_container_plots:
+            # left side and right side of the screen
+            (
+                monthly_report_plot_left_side,
+                monthly_report_plot_right_side,
+            ) = st.columns(2)
+
+            # display the plot the stacked bar chart - plot 1
+            monthly_report_plot(
+                df_expenses,
+                monthly_report_choose_year,
+                monthly_report_choose_month,
+                side=monthly_report_plot_left_side,
+            )
+
+            # display the plot the stacked bar chart - plot 2
+            monthly_report_plot(
+                df_expenses,
+                monthly_report_choose_year_2,
+                monthly_report_choose_month_2,
+                side=monthly_report_plot_right_side,
             )
 
     # --- CSS hacks --- #
