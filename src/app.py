@@ -703,6 +703,8 @@ if uploaded_file is not None:
                 )
             )
 
+            # calculate the difference between the metric on the right
+            # compared to the metric on the left
             diff_metric1_metric2 = round(
                 monthly_report_total_expenses_metric_2
                 - monthly_report_total_expenses_metric_1,
