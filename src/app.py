@@ -170,7 +170,7 @@ def metric_total_amount_spent(
     df_expenses_filtered = df.loc[
         (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
     ]
-    print(max(df_expenses_filtered["date"]))
+    # print(max(df_expenses_filtered["date"]))
 
     # calculate total amount spent in the current timeframe selected
     current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
