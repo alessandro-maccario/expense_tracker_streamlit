@@ -13,6 +13,7 @@ from pkgs.global_vars import today, past
 import plotly.express as px
 import plotly.graph_objects as go
 
+# from st_pages import Page, show_pages, hide_pages
 
 # --- Metric functions --- #
 
@@ -194,7 +195,7 @@ def metric_total_amount_spent(
     )
 
     # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
-    metric1_total_amount_spent.metric(
+    overall_overview_tab1.metric(
         label="Expenses in the timeframe",
         value=current_total_expenses,
         delta=diff_total_expenses,
@@ -269,7 +270,7 @@ def metric_total_amount_spent_category(
     )
 
     # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
-    metric2_total_amount_spent_category.metric(
+    overall_overview_tab1.metric(
         label=f"Expenses for {category}",
         value=total_expenses_category,
         delta=diff_total_expenses_category,
@@ -285,7 +286,6 @@ def plot_bar_chart_category_total(
     """
     Bar chart to show all the categories availbable in a specific
     timeframe and the total amount spent for each category
-
     """
 
     # Filter data between two dates, "From" and "To" date
@@ -328,7 +328,7 @@ def plot_bar_chart_category_total(
     category_order_df = pd.DataFrame(index=x_coords)
 
     # plot
-    plot1 = st.plotly_chart(
+    plot1 = overall_overview_tab1.plotly_chart(
         fig_bar_chart,
         use_container_width=True,
     )
@@ -373,7 +373,7 @@ def plot_donut_chart_store_total(
     fig_pie_plot.update_layout(uniformtext_minsize=12, uniformtext_mode="hide")
 
     # plot the pie plot for stores
-    plot2 = st.plotly_chart(
+    plot2 = overall_overview_tab1.plotly_chart(
         fig_pie_plot,
         use_container_width=True,
     )
@@ -460,7 +460,7 @@ def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str) -> None:
     )
 
     # plot the actual graph
-    plot3 = st.plotly_chart(
+    plot3 = monthly_trend_tab2.plotly_chart(
         fig_bar_chart_months,
         use_container_width=True,
         sharing="streamlit",
@@ -470,7 +470,7 @@ def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str) -> None:
     return plot3
 
 
-# REQUIRED by Streamlit for donwloading the data in the correct format:
+# REQUIRED by Streamlit for downloading the data in the correct format:
 # define a function to convert the sample data before using it into the download button.
 def convert_df(df: pd.DataFrame) -> pd.DataFrame:
     return df.to_csv(sep=";", index=False).encode("utf-8")
@@ -480,6 +480,31 @@ def convert_df(df: pd.DataFrame) -> pd.DataFrame:
 
 # set the page default setting to wide
 st.set_page_config(layout="wide")
+
+# Specify what pages should be shown in the sidebar, and what their titles and icons
+# should be.
+# NOTE: You should only hide pages that have also been added to the sidebar already.
+# show_pages(
+#     [
+#         Page("app.py", "Overall Overview", "📰"),
+#         Page("pages/second_page.py", "Monthly Overview", ":books:"),
+#         Page("pages/third_page.py", "Detailed Overview", icon="📈"),
+#     ]
+# )
+
+# you can hide pages that have been already inserted in the app
+# hide_pages(["Home", "Page 2", "Page 3"])
+
+
+# remove white space at the top:
+# https://stackoverflow.com/questions/71209203/remove-header-whitespacing-from-streamlit-hydralit
+reduce_header_height_style = """
+    <style>
+        div.block-container {padding-top:2rem;}
+    </style>
+"""
+st.markdown(reduce_header_height_style, unsafe_allow_html=True)
+
 
 # sidebar
 with st.sidebar:
@@ -537,6 +562,29 @@ with st.sidebar:
 # If the uploaded_file is not None, then show the dashboard;
 # otherwise show the hint to upload it.
 if uploaded_file is not None:
+    # ###############################################
+    # --- Create buttons to swich between pages --- #
+    # Create columns to position the plots: create a container
+    # buttons_container = st.container()
+
+    # with buttons_container:
+    #     page_00, page_0, page_1, page_2, page_3, page_4, page_5 = st.columns((7))
+    #     with page_1:
+    #         if st.button("Overall Overview"):
+    #             st.switch_page("app.py")
+    #     with page_2:
+    #         if st.button("Detail Overview"):
+    #             st.switch_page("pages/second_page.py")
+    #     with page_3:
+    #         if st.button("Personal Finance"):
+    #             st.switch_page("pages/third_page.py")
+    # ###############################################
+
+    # define three tabs where to insert the plots
+    overall_overview_tab1, monthly_trend_tab2, monthly_comparison_tab3 = st.tabs(
+        ["📈 Overall Overview", "👓 Monthly Overview", "👨🏼‍🤝‍👨🏼 Monthly comparison"]
+    )
+
     # sort the data by date
     df_expenses.sort_values(by=["date"], inplace=True)
 
@@ -547,8 +595,8 @@ if uploaded_file is not None:
     )
 
     # define start and end date
-    past_date = from_date.date_input("From", past, key="from_date")
-    today_date = to_date.date_input("To", today, key="to_date")
+    past_date = overall_overview_tab1.date_input("From", past, key="from_date")
+    today_date = overall_overview_tab1.date_input("To", today, key="to_date")
 
     # define the categories that show some values in it (exclude those categories that are
     # empty with no value). Sort the list from higher to lower sum of expenses.
@@ -567,7 +615,7 @@ if uploaded_file is not None:
     ).sort_values(ascending=False)
 
     # let the user select the category
-    category_selection = category_sel.selectbox(
+    category_selection = overall_overview_tab1.selectbox(
         "Select the category:", categories_with_data.index.unique()
     )
 
@@ -603,7 +651,7 @@ if uploaded_file is not None:
     # separator
     st.divider()
 
-    ########################################################
+    # ########################################################
     # --- Bar plot per year and months --- #
     # --- Create columns to position the selection box --- #
     (
@@ -614,7 +662,7 @@ if uploaded_file is not None:
     ) = st.columns((0.5, 1, 1, 1))
 
     # selection box for letting the user filter the year
-    choose_year = selectionbox_barplot1.selectbox(
+    choose_year = monthly_trend_tab2.selectbox(
         "Choose the year",
         df_expenses["year"].unique(),
     )
