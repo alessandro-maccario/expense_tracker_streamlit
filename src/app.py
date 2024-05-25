@@ -12,7 +12,6 @@ from io import BytesIO
 from pkgs.global_vars import today, past
 import plotly.express as px
 import plotly.graph_objects as go
-from st_pages import Page, show_pages, hide_pages
 
 # --- Metric functions --- #
 
@@ -484,29 +483,15 @@ def convert_df(df: pd.DataFrame) -> pd.DataFrame:
 # set the page default setting to wide
 st.set_page_config(layout="wide")
 
-# Specify what pages should be shown in the sidebar, and what their titles and icons
-# should be.
-# NOTE: You should only hide pages that have also been added to the sidebar already.
-show_pages(
-    [
-        Page("app.py", "Overall Overview", "📰"),
-        Page("pages/second_page.py", "Monthly Overview", ":books:"),
-        Page("pages/third_page.py", "Detailed Overview", icon="📈"),
-    ]
-)
-
-# you can hide pages that have been already inserted in the app
-hide_pages(["Overall Overview", "Monthly Overview", "Detailed Overview"])
-
 
 # remove white space at the top:
 # https://stackoverflow.com/questions/71209203/remove-header-whitespacing-from-streamlit-hydralit
-reduce_header_height_style = """
-    <style>
-        div.block-container {padding-top:2rem;}
-    </style>
-"""
-st.markdown(reduce_header_height_style, unsafe_allow_html=True)
+# reduce_header_height_style = """
+#     <style>
+#         div.block-container {padding-top:2rem;}
+#     </style>
+# """
+# st.markdown(reduce_header_height_style, unsafe_allow_html=True)
 
 
 # sidebar
@@ -519,9 +504,6 @@ with st.sidebar:
     uploaded_file = st.file_uploader(
         "Upload a file (.csv OR .xlsx)", type=["csv", "xlsx"]
     )
-
-    # # separator
-    # st.divider()
 
     # Check if file was uploaded
     if uploaded_file:
@@ -662,19 +644,8 @@ if uploaded_file is not None:
     #####################################
     # --- Monthly report comparison --- #
     #####################################
-    # TODO:
-    # Convert later on into a function!
 
     # Create columns to place the two plots
-    # --- Create columns to position the selection box --- #
-
-    # TODO:
-    # rename these container accordingly based on the values that they contain
-    # Create columns to position the plots: create a container
-    monthly_report_data_container = st.container()
-    monthly_report_data_container_metrics = st.container()
-    monthly_report_data_container_plots = st.container()
-
     with monthly_comparison_tab3:
         selector_year1, selector_month1, selector_year2, selector_month2 = st.columns(
             (1, 1, 1, 1)
@@ -718,8 +689,8 @@ if uploaded_file is not None:
             monthly_report_metric_middle_side,
             monthly_report_metric_right_side,
         ) = st.columns((0.8, 0.6, 0.8))
-        # set up the metrics
 
+        # set up the metrics
         with monthly_report_metric_left_side:
             # display the monthly report metric1
             monthly_report_total_expenses_metric_1, monthly_report_metric1 = (
@@ -743,7 +714,6 @@ if uploaded_file is not None:
             )
 
         with monthly_report_metric_middle_side:
-
             # calculate the difference between the metric on the right
             # compared to the metric on the left
             diff_metric1_metric2 = round(
@@ -758,6 +728,7 @@ if uploaded_file is not None:
                 value=diff_metric1_metric2,
             )
 
+        # set the position of the plots
         (
             monthly_report_plot_left_side,
             monthly_report_plot_right_side,
