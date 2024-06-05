@@ -18,23 +18,28 @@ It has been built on the so-called [**FIRE Movement**](https://en.wikipedia.org/
 
 ### What does this application do? 💡
 
-Simply put, it gives you insight into your financial expenses. An excel spreadsheet would do the work but, let's be honest, the result could be quite ugly and the customization of the plots can be quite daunting. Python & Streamlit seemed the best choice to go with.
+Simply put, it gives you insight into your financial expenses. Python & Streamlit seemed the best choice to go with due to the easy implementation of a UI.
 
 This tool can immediately answer the following example questions:
 
-- ???
-- ???
-- ???
+- How much, in a certain timeframe, did you spend?
+- How much, in a certain timeframe, did you spend and in which category?
+- How much, in a certain timeframe, did you spend compared to the last 30 days?
+- How much did you spend monthly?
+- Comparing two months, in which month did you spend less/more and for what?
+
+### Discover the Dashboard 📚
+
+The dashboard has the following interface:
+
+1. ADD THE FIRST PAGE WHERE YOU LOAD THE DATA. ADD AN ANIMATED GIF TO SHOW WHAT HAS TO BE DONE.
+
+The very first thing to do when you fire up the dashboard is to load the file that contains your data. In the sidebar, you can click on the _Download a sample_ to get an idea of what the file should look like. The only boundary condition, is that the data can be found in the main sheet (for instance, using _Excel_ just one sheet with all the data).
+
+The **delta** value underneath the metrics, shows the current total minus the last 30 days expenses. If negative, you spent less (green), while if positive you spent more (red).
 
 KEEP READING THIS:
 
 - https://www.freecodecamp.org/news/how-to-write-a-good-readme-file/
 
 TO ANSWER HERE:
-
-- What your application does?
-
-### Dashboard explanation
-
-The **delta** value underneath the metrics, shows the current total minus the last 30 days expenses
-compare to the 'From' day. If negative, you spent less (green); if positive you spent more (red).
