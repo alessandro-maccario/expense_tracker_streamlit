@@ -45,17 +45,17 @@ class Expense(Base):  # class name, usually singular
     # create columns
     id = Column(Integer, primary_key=True)
     input_date = Column(Date)
-    expense_category = Column(String)
-    expense_type = Column(String)
+    expense_category = Column(String(15))
+    expense_type = Column(String(30))
     expense_price = Column(Float)
-    store = Column(String)
-    city = Column(String)
-    month_number = Column(String)
-    year_number = Column(String)
-    day_number = Column(String)
-    isoweek_day = Column(String)
-    day_of_the_week = Column(String)
-    month_short = Column(String)
+    store = Column(String(30))
+    city = Column(String(30))
+    month_number = Column(String(2))
+    year_number = Column(String(4))
+    day_number = Column(String(2))
+    isoweek_day = Column(String(1))
+    day_of_the_week = Column(String(15))
+    month_short = Column(String(3))
 
 
 # --- Enforcing all the changes --- #
