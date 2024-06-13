@@ -2,10 +2,7 @@
 import datetime
 import pandas as pd
 import streamlit as st
-from io import BytesIO
 from pkgs.global_vars import today, past
-import plotly.express as px
-import plotly.graph_objects as go
 
 
 def total_expenses_timeframe(df: pd.DataFrame, year: str, month: str) -> None:
