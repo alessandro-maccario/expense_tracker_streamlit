@@ -5,13 +5,9 @@
 """
 
 # use streamlit
-import datetime
 import pandas as pd
 import streamlit as st
-from io import BytesIO
 from pkgs.global_vars import today, past
-import plotly.express as px
-import plotly.graph_objects as go
 from pkgs.metrics import *
 from pkgs.plots import *
 
@@ -297,7 +293,7 @@ if uploaded_file is not None:
             )
 
     # --- CSS hacks --- #
-    with open(r"C:\solutions\learning_python\expense_tracker\src\pkgs\style.css") as f:
+    with open(r"C:\solutions\learning_python\expense_tracker\src\style\style.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # TODO:
