@@ -48,20 +48,14 @@ class TEST_Expense(Base):  # class name, usually singular
     expense_category = Column(String(15))
     expense_type = Column(String(30))
     expense_price = Column(Float)
-    # store = Column(String(30))
-    # city = Column(String(30))
-    # month_number = Column(String(2))
-    # year_number = Column(String(4))
-    # day_number = Column(String(2))
-    # isoweek_day = Column(String(1))
-    # day_of_the_week = Column(String(15))
-    # month_short = Column(String(3))
-
-    # def __init__(input_date, self, expense_category, expense_type, expense_price):
-    #     self.input_date = input_date
-    #     self.expense_category = expense_category
-    #     self.expense_type = expense_type
-    #     self.expense_price = expense_price
+    store = Column(String(30))
+    city = Column(String(30))
+    month_number = Column(String(2))
+    year_number = Column(String(4))
+    day_number = Column(String(2))
+    isoweek_day = Column(String(1))
+    day_of_the_week = Column(String(15))
+    month_short = Column(String(3))
 
 
 # if __name__ == "__main__":
