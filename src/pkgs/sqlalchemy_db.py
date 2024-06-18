@@ -7,7 +7,16 @@
 """
 
 # --- Import packages --- #
-from sqlalchemy import create_engine, Column, Float, Integer, String, Date
+from sqlalchemy import (
+    create_engine,
+    Column,
+    Float,
+    Integer,
+    String,
+    Date,
+    DateTime,
+    func,
+)
 from sqlalchemy.orm import declarative_base
 from dotenv import load_dotenv  # to load the variables stored in the .env file
 import os
@@ -56,6 +65,7 @@ class TEST_Expense(Base):  # class name, usually singular
     isoweek_day = Column(String(1))
     day_of_the_week = Column(String(15))
     month_short = Column(String(3))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
 # if __name__ == "__main__":
