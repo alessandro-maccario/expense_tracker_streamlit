@@ -29,6 +29,7 @@ def commit_to_database(
     isoweek_day: str,
     day_of_the_week: str,
     month_short: str,
+    created_at: datetime,
 ):
     """Connect to MySQL DB and the "expenses" table to save the data when the user,
     after inserting the data into the UI, press the "Submit" button.
@@ -67,6 +68,7 @@ def commit_to_database(
             isoweek_day=isoweek_day,
             day_of_the_week=day_of_the_week,
             month_short=month_short,
+            created_at=created_at,
         )
         session.add(expense)
         logger.info("About to commit session")
@@ -116,17 +118,32 @@ def read_from_database():
                 expense.expense_category,
                 expense.expense_type,
                 expense.expense_price,
+                expense.store,
+                expense.city,
+                expense.month_number,
+                expense.day_of_the_week,
+                expense.month_short,
+                expense.created_at,
             ]
 
     # convert the dict to a dataframe
-    df_expenses = pd.DataFrame(dict_expenses.items(), columns=["Date", "DateValue"])
-
-    # expense = expenses[0]
-    # expenses_information = [
-    #     expense.input_date,
-    #     expense.expense_category,
-    #     expense.expense_type,
-    #     expense.expense_price,
-    # ]
+    # df_expenses = pd.DataFrame(dict_expenses.items(), columns=["Date", "DateValue"])
+    df_expenses = pd.DataFrame.from_dict(
+        dict_expenses,
+        orient="index",
+        columns=[
+            "input_date",
+            "expense_category",
+            "expense_type",
+            "expense_price",
+            "store",
+            "city",
+            "month_number",
+            "day_of_the_week",
+            "month_short",
+            "created_at",
+        ],
+    )
+    # print(df_expenses)
 
     return df_expenses

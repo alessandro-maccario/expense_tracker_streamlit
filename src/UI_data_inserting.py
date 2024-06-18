@@ -12,6 +12,7 @@ from pkgs.sqlalchemy_db import (
     engine,
 )
 from pkgs.CRUD import commit_to_database, read_from_database
+from datetime import datetime
 
 # TODO:
 # Need to integrate this code as another tab/page into the main app!
@@ -114,6 +115,8 @@ with create_read_data_db:
         day_of_the_week = input_date_value.strftime("%A")
         # get the month as a three letter string
         month_short = input_date_value.strftime("%b")
+        # get the current timestamp when the item has been inserted in the DB
+        created_at = datetime.now()
 
         # Now commit the data to the database
         commit_to_database(
@@ -129,13 +132,20 @@ with create_read_data_db:
             isoweek_day,
             day_of_the_week,
             month_short,
+            created_at,
         )
         st.success("Changes committed successfully.")
 
-
-# TODO:
-# all of this variable should be sent to the "sqlalchemy_db.py" file as soon as the
-# submit button is pressed
+        # Show only those rows that have been committed when the user inserted the data
+        db_dataframe = read_from_database()
+        db_current_session = db_dataframe[
+            (
+                db_dataframe["created_at"].dt.date
+                >= datetime.strptime(created_at.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
+            )
+        ]
+        print(created_at.date)
+        db_current_display = st.dataframe(db_dataframe, use_container_width=True)
 
 
 # TODO:
