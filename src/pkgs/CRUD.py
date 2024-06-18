@@ -1,4 +1,5 @@
 # --- Import packages --- #
+import pandas as pd
 import streamlit as st
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
@@ -6,7 +7,7 @@ from pkgs.sqlalchemy_db import (
     TEST_Expense,
     engine,
 )
-
+from datetime import datetime
 import logging
 
 # Set up logging
@@ -15,7 +16,20 @@ logger = logging.getLogger(__name__)
 
 
 # Function to commit changes to the database
-def commit_to_database(input_date, expense_category, expense_type, expense_price):
+def commit_to_database(
+    input_date: datetime,
+    expense_category: str,
+    expense_type: str,
+    expense_price: float,
+    store: str,
+    city: str,
+    month_number: str,
+    year_number: str,
+    day_number: str,
+    isoweek_day: str,
+    day_of_the_week: str,
+    month_short: str,
+):
     """Connect to MySQL DB and the "expenses" table to save the data when the user,
     after inserting the data into the UI, press the "Submit" button.
 
@@ -45,14 +59,14 @@ def commit_to_database(input_date, expense_category, expense_type, expense_price
             expense_category=expense_category,
             expense_type=expense_type,
             expense_price=expense_price,
-            # store=store,
-            # city=city,
-            # month_number=month_number,
-            # year_number=year_number,
-            # day_number=day_number,
-            # isoweek_day=isoweek_day,
-            # day_of_the_week=day_of_the_week,
-            # month_short=month_short,
+            store=store,
+            city=city,
+            month_number=month_number,
+            year_number=year_number,
+            day_number=day_number,
+            isoweek_day=isoweek_day,
+            day_of_the_week=day_of_the_week,
+            month_short=month_short,
         )
         session.add(expense)
         logger.info("About to commit session")
@@ -64,3 +78,55 @@ def commit_to_database(input_date, expense_category, expense_type, expense_price
         st.error(f"An error occurred: {e}")
     finally:
         session.close()
+
+    return
+
+
+def read_from_database():
+    """Function to read the expenses table.
+
+
+    Return
+    ------
+    None
+    """
+    # Create a configured "Session" class
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    # query all the expenses available in the Class TEST_Expense
+    # and extract the information
+    expenses = session.query(TEST_Expense).all()
+
+    # create a dictionary to store the information from each row
+    # of the database based on the id used as a key
+    dict_expenses = dict()
+
+    # loop through each user that we get from the expenses and extract
+    # the information from SQLAlchemy data type
+    for expense in expenses:
+        # save the id to be used as a key for the dictionary
+        row_id_expense = expense.id
+
+        # if the key not in the dictionary, then add it and
+        # add all the information regarding the specific row
+        if row_id_expense not in dict_expenses:
+            dict_expenses[row_id_expense] = [
+                expense.input_date,
+                expense.expense_category,
+                expense.expense_type,
+                expense.expense_price,
+            ]
+
+    # convert the dict to a dataframe
+    df_expenses = pd.DataFrame(dict_expenses.items(), columns=["Date", "DateValue"])
+
+    # expense = expenses[0]
+    # expenses_information = [
+    #     expense.input_date,
+    #     expense.expense_category,
+    #     expense.expense_type,
+    #     expense.expense_price,
+    # ]
+
+    return df_expenses
