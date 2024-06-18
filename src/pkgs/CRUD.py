@@ -127,7 +127,6 @@ def read_from_database():
             ]
 
     # convert the dict to a dataframe
-    # df_expenses = pd.DataFrame(dict_expenses.items(), columns=["Date", "DateValue"])
     df_expenses = pd.DataFrame.from_dict(
         dict_expenses,
         orient="index",
@@ -144,6 +143,5 @@ def read_from_database():
             "created_at",
         ],
     )
-    # print(df_expenses)
 
     return df_expenses

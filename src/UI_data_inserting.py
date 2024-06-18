@@ -144,7 +144,6 @@ with create_read_data_db:
                 >= datetime.strptime(created_at.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
             )
         ]
-        print(created_at.date)
         db_current_display = st.dataframe(db_dataframe, use_container_width=True)
 
 
