@@ -30,9 +30,7 @@ with st.sidebar:
 
 
 # CRUD operations
-create_read_data_db, delete_read_data_db, update_read_data_db = st.tabs(
-    ["➕​ CREATE", "➖​ DELETE", "🔄 UPDATE"]
-)
+create_read_data_db, update_read_data_db = st.tabs(["➕​ CREATE", "🔄 UPDATE"])
 
 # using the first tab
 with create_read_data_db:
@@ -160,13 +158,34 @@ with create_read_data_db:
 # update the database
 with update_read_data_db:
     st.markdown("##### Edit the dataframe")
+
     # read from the database
     db_dataframe = (
         read_from_database()
         .sort_values(by=["created_at"], ascending=False)
-        .reset_index()
+        .reset_index(drop=True)
     )
-    st.data_editor(db_dataframe, use_container_width=True)
+    st.data_editor(
+        db_dataframe,
+        disabled=["index", "created_at"],
+        key="editable_dataframe",
+        num_rows="dynamic",
+        use_container_width=True,
+    )
+    st.write("Here's the value in Session State:")
+    st.write(st.session_state["editable_dataframe"])
+    # access the key of the dictionary "editable_dataframe"
+    # st.write(st.session_state["editable_dataframe"]["edited_rows"])
+    for idx_row in st.session_state["editable_dataframe"]["edited_rows"]:
+        print(idx_row)
+
+
+# TODO:
+# To save the data to the db: load the current table available in the MySQL db.
+# Get only the changes that happens in the st.data_editor: save the changes in the dataframe
+# that you read from the database.
+# Save the dataframe again to the DB using a callback function based on the "commit_to_database()"
+# function available in the CRUD.py file.
 
 # TODO:
 # - need to add a button to update the table in the database
