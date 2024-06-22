@@ -134,76 +134,46 @@ with create_read_data_db:
             month_short,
             created_at,
         )
-        st.success("Changes committed successfully.")
 
-        # Show only those rows that have been committed when the user inserted the data
+        # read from the database
         db_dataframe = read_from_database()
-        db_current_session = db_dataframe[
-            (
-                db_dataframe["created_at"].dt.date
-                >= datetime.strptime(created_at.strftime("%Y-%m-%d"), "%Y-%m-%d").date()
-            )
-        ]
-        db_current_display = st.dataframe(db_dataframe, use_container_width=True)
+
+        # filter the dataframe to get only the last five most recent entries that the user committed
+        db_current_session = (
+            db_dataframe[(db_dataframe["created_at"].dt.date >= datetime.now().date())]
+            .sort_values(by=["created_at"], ascending=False)
+            .head()
+        )
+        st.markdown("#### Last 5 rows inserted in the database.")
+        db_current_display = st.table(db_current_session)
+
+        st.success("Changes committed successfully.")
 
 
 # TODO:
 # Need to display the dataframe, then select the row and then do something
-# in terms of deleting the row based on the ID.
+# in terms of deleting/editing the row based on the ID.
 # Look here:
 # - https://gist.github.com/treuille/e8f07ebcd92265a68ecec585f7594918
 # - https://discuss.streamlit.io/t/can-you-select-rows-in-a-table/737/2
 
-# # delete an item
-# with st.form("delete_data_db"):
-#     st.markdown("##### Select a row and delete it from the database")
-#     # create the needed columns
-#     (
-#         left_space_delete,
-#         text_input_item_delete,
-#         right_space_delete,
-#     ) = st.columns((1, 2, 1))
-#     (
-#         left_space1_delete,
-#         left_space2_delete,
-#         left_space3_delete,
-#         save_the_data_button_delete,
-#     ) = st.columns((1, 1, 1, 1))
+# update the database
+with update_read_data_db:
+    st.markdown("##### Edit the dataframe")
+    # read from the database
+    db_dataframe = (
+        read_from_database()
+        .sort_values(by=["created_at"], ascending=False)
+        .reset_index()
+    )
+    st.data_editor(db_dataframe, use_container_width=True)
 
-#     # with notation
-#     with text_input_item_delete:
-#         text_input_item_delete.text_input("Delete an item")
-
-#     # Every form must have a submit button.
-#     submitted = save_the_data_button_delete.form_submit_button(
-#         "Submit", help="Delete the data to the database."
-#     )
+# TODO:
+# - need to add a button to update the table in the database
+# - add another page to upload an excel sheet directly to the database (either by dropping the table completely
+# or by adding the rows that were not there before based on the values in the columns to avoid duplicates)
 
 # TODO:
 # For editable dataframes, look here:
 # - https://blog.streamlit.io/editable-dataframes-are-here/
 # - https://discuss.streamlit.io/t/is-it-possible-to-use-a-button-to-adjust-values-in-an-editable-dataframe/43391
-# # update an item
-# with st.form("update_data_db"):
-#     st.markdown("##### Select a row and delete it from the database")
-#     # create the needed columns
-#     (
-#         left_space_delete,
-#         text_input_item_delete,
-#         right_space_delete,
-#     ) = st.columns((1, 2, 1))
-#     (
-#         left_space1_delete,
-#         left_space2_delete,
-#         left_space3_delete,
-#         save_the_data_button_delete,
-#     ) = st.columns((1, 1, 1, 1))
-
-#     # with notation
-#     with text_input_item_delete:
-#         text_input_item_delete.text_input("Delete an item")
-
-#     # Every form must have a submit button.
-#     submitted = save_the_data_button_delete.form_submit_button(
-#         "Submit", help="Delete the data to the database."
-#     )
