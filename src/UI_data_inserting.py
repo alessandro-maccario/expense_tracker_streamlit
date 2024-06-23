@@ -155,6 +155,10 @@ with create_read_data_db:
 # - https://gist.github.com/treuille/e8f07ebcd92265a68ecec585f7594918
 # - https://discuss.streamlit.io/t/can-you-select-rows-in-a-table/737/2
 
+# Session state:
+# https://github.com/streamlit/docs/blob/main/python/api-examples-source/data.data_editor4.py
+# https://doc-data-editor-changed.streamlit.app/
+
 # update the database
 with update_read_data_db:
     st.markdown("##### Edit the dataframe")
@@ -176,8 +180,30 @@ with update_read_data_db:
     st.write(st.session_state["editable_dataframe"])
     # access the key of the dictionary "editable_dataframe"
     # st.write(st.session_state["editable_dataframe"]["edited_rows"])
-    for idx_row in st.session_state["editable_dataframe"]["edited_rows"]:
-        print(idx_row)
+    # use this index and the column name to change the current df and update it
+
+    #
+    for key in st.session_state["editable_dataframe"]["edited_rows"]:
+        if key in st.session_state["editable_dataframe"]["edited_rows"]:
+            print("------ ID KEYS AVAILABLE -------")
+            try:
+                # if found, save the edited value into the session_state_expense_type
+                session_state_expense_type = st.session_state["editable_dataframe"][
+                    "edited_rows"
+                ][key]["expense_type"]
+                print("ID KEY:", key, session_state_expense_type)
+
+                # if found, save the edited value into the session_state_expense_price
+                session_state_expense_price = st.session_state["editable_dataframe"][
+                    "edited_rows"
+                ][key]["expense_price"]
+                print("ID KEY:", key, session_state_expense_price)
+            # if key not found, then show me the column where the value is missing
+            except KeyError as e:
+                print(f"{e} not found")
+
+# use .iloc[key, column] to insert the value if it has been found.
+# if not, you should be able to leave the current value has default value.
 
 
 # TODO:
