@@ -159,8 +159,10 @@ with create_read_data_db:
 # https://github.com/streamlit/docs/blob/main/python/api-examples-source/data.data_editor4.py
 # https://doc-data-editor-changed.streamlit.app/
 
+
 # update the database
 with update_read_data_db:
+    # with st.form("update_read_data_db", clear_on_submit=False):
     st.markdown("##### Edit the dataframe")
 
     # read from the database
@@ -169,7 +171,7 @@ with update_read_data_db:
         .sort_values(by=["created_at"], ascending=False)
         .reset_index(drop=True)
     )
-    st.data_editor(
+    edited_df = st.data_editor(
         db_dataframe,
         disabled=["index", "created_at"],
         key="editable_dataframe",
@@ -182,29 +184,90 @@ with update_read_data_db:
     # st.write(st.session_state["editable_dataframe"]["edited_rows"])
     # use this index and the column name to change the current df and update it
 
+    ###############################
     #
+    # # Every form must have a submit button.
+    # submit_data_editor_changes = st.form_submit_button(
+    #     "Submit", help="Submit the changes to the database."
+    # )
+
+    # if the button is pressed, then save the changes to the db
+    # if submit_data_editor_changes:
     for key in st.session_state["editable_dataframe"]["edited_rows"]:
         if key in st.session_state["editable_dataframe"]["edited_rows"]:
             print("------ ID KEYS AVAILABLE -------")
             try:
+                # INPUT DATE
+                # if found, save the edited value into the session_input_date
+                session_input_date = st.session_state["editable_dataframe"][
+                    "edited_rows"
+                ][key]["input_date"]
+                print("ID KEY:", key, session_input_date)
+
+                # EXPENSE TYPE
                 # if found, save the edited value into the session_state_expense_type
                 session_state_expense_type = st.session_state["editable_dataframe"][
                     "edited_rows"
                 ][key]["expense_type"]
                 print("ID KEY:", key, session_state_expense_type)
 
+                # EXPENSE PRICE
                 # if found, save the edited value into the session_state_expense_price
                 session_state_expense_price = st.session_state["editable_dataframe"][
                     "edited_rows"
                 ][key]["expense_price"]
                 print("ID KEY:", key, session_state_expense_price)
+
+                # TODO:
+                # Need to add all of the other columns as done right here above,
+                # then call the commit_to_database() function to commit everything
+                # to the DB (attention: do not know how to fill up the values that have
+                # not been changed by the user into the function)!
+
+                # EXPENSE TYPE BEFORE/AFTER
+                print("BEFORE:", db_dataframe.loc[key, "expense_type"])
+                edited_df.loc[key, "expense_type"] = session_state_expense_type
+                print("AFTER:", edited_df.loc[key, "expense_type"])
+
+                # EXPENSE PRICE BEFORE/AFTER
+                print("BEFORE:", db_dataframe.loc[key, "expense_price"])
+                edited_df.loc[key, "expense_price"] = session_state_expense_price
+                print("AFTER:", edited_df.loc[key, "expense_price"])
+
+                # if db_dataframe.iloc[key, "expense_type"] != session_state_expense_type:
+                #     # Update the original dataframe with edited values
+                #     st.write("BEFORE:", db_dataframe.iloc[key]["expense_type"])
+                #     db_dataframe.iloc[key]["expense_type"] = session_state_expense_type
+                #     st.write("AFTER:", db_dataframe.iloc[key]["expense_type"])
+                # else:
+                #     pass
+
             # if key not found, then show me the column where the value is missing
             except KeyError as e:
                 print(f"{e} not found")
 
+    # show the edited table
+    st.table(edited_df)
+
+# TODO:
 # use .iloc[key, column] to insert the value if it has been found.
 # if not, you should be able to leave the current value has default value.
+# To test: insert the value(s) and then st.write the dataframe again.
+# In the end, save the data to the DB with a button for instance.
+# NOTE:
+# need to insert the other columns to be checked and inserted!
 
+# NOTE:
+# DELETING ROWS:
+# https://discuss.streamlit.io/t/deleting-rows-in-st-data-editor-progmatically/46337
+
+# NOTE:
+# SQL CONNECTION
+# https://docs.streamlit.io/develop/api-reference/connections/st.connections.sqlconnection
+
+# NOTE:
+# STATEFULLNESS:
+# https://docs.streamlit.io/develop/concepts/architecture/session-state#initialization
 
 # TODO:
 # To save the data to the db: load the current table available in the MySQL db.
