@@ -4,6 +4,7 @@
 """
 
 # --- Import packages --- #
+import pandas as pd
 import streamlit as st
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
@@ -35,7 +36,7 @@ create_read_data_db, update_read_data_db = st.tabs(["➕​ CREATE", "🔄 UPDAT
 # using the first tab
 with create_read_data_db:
     # read the data from the DB and display the dataframe
-    print(read_from_database())
+    # print(read_from_database())
 
     # create the form to add an item and send the data to the db
     with st.form("add_data_db", clear_on_submit=True):
@@ -162,92 +163,187 @@ with create_read_data_db:
 
 # update the database
 with update_read_data_db:
-    # with st.form("update_read_data_db", clear_on_submit=False):
-    st.markdown("##### Edit the dataframe")
+    # create the form to add an item and send the data to the db
+    with st.form("update_read_data_db"):
+        st.markdown("##### Edit the dataframe")
 
-    # read from the database
-    db_dataframe = (
-        read_from_database()
-        .sort_values(by=["created_at"], ascending=False)
-        .reset_index(drop=True)
-    )
-    edited_df = st.data_editor(
-        db_dataframe,
-        disabled=["index", "created_at"],
-        key="editable_dataframe",
-        num_rows="dynamic",
-        use_container_width=True,
-    )
-    st.write("Here's the value in Session State:")
-    st.write(st.session_state["editable_dataframe"])
-    # access the key of the dictionary "editable_dataframe"
-    # st.write(st.session_state["editable_dataframe"]["edited_rows"])
-    # use this index and the column name to change the current df and update it
+        # read from the database
+        db_dataframe = (
+            read_from_database()
+            .sort_values(by=["created_at"], ascending=False)
+            .reset_index(drop=True)
+        )
+        edited_df = st.data_editor(
+            db_dataframe,
+            disabled=["index", "created_at"],
+            key="editable_dataframe",
+            num_rows="dynamic",
+            use_container_width=True,
+            column_config={
+                "input_date": st.column_config.DateColumn(
+                    format="YYYY-MM-DD", required=True
+                ),
+            },
+        )
+        st.write("Here's the value in Session State:")
+        st.write(st.session_state["editable_dataframe"])
 
-    ###############################
-    #
-    # # Every form must have a submit button.
-    # submit_data_editor_changes = st.form_submit_button(
-    #     "Submit", help="Submit the changes to the database."
-    # )
+        ###############################
 
-    # if the button is pressed, then save the changes to the db
-    # if submit_data_editor_changes:
-    for key in st.session_state["editable_dataframe"]["edited_rows"]:
-        if key in st.session_state["editable_dataframe"]["edited_rows"]:
-            print("------ ID KEYS AVAILABLE -------")
-            try:
+        # if the button is pressed, then save the changes to the db
+        # if submit_data_editor_changes:
+        for key in st.session_state["editable_dataframe"]["edited_rows"]:
+            if key in st.session_state["editable_dataframe"]["edited_rows"]:
+                print("------ ID KEYS AVAILABLE -------")
+
+                #################
+                ##### TEST ######
                 # INPUT DATE
-                # if found, save the edited value into the session_input_date
-                session_input_date = st.session_state["editable_dataframe"][
-                    "edited_rows"
-                ][key]["input_date"]
-                print("ID KEY:", key, session_input_date)
+                # get the data in the corresponding cell for the "key" and the corresponding column
+                default_value_input_date = db_dataframe.at[key, "input_date"]
+                # use the default value as default in case nothing as been found in the session_state
+                session_input_date = (
+                    st.session_state["editable_dataframe"]["edited_rows"]
+                    .get(key, {})
+                    .get("input_date", default_value_input_date)
+                )
+                # print("INPUT DATE IS:", session_input_date)
 
                 # EXPENSE TYPE
-                # if found, save the edited value into the session_state_expense_type
-                session_state_expense_type = st.session_state["editable_dataframe"][
-                    "edited_rows"
-                ][key]["expense_type"]
-                print("ID KEY:", key, session_state_expense_type)
+                # get the data in the corresponding cell for the "key" and the corresponding column
+                default_value_expense_type = db_dataframe.at[key, "expense_type"]
+                # use the default value as default in case nothing as been found in the session_state
+                session_expense_type = (
+                    st.session_state["editable_dataframe"]["edited_rows"]
+                    .get(key, {})
+                    .get("expense_type", default_value_expense_type)
+                )
+                # print("EXPENSE TYPE IS:", session_expense_type)
 
                 # EXPENSE PRICE
-                # if found, save the edited value into the session_state_expense_price
-                session_state_expense_price = st.session_state["editable_dataframe"][
-                    "edited_rows"
-                ][key]["expense_price"]
-                print("ID KEY:", key, session_state_expense_price)
+                # get the data in the corresponding cell for the "key" and the corresponding column
+                default_value_expense_price = db_dataframe.at[key, "expense_price"]
+                # use the default value as default in case nothing as been found in the session_state
+                session_expense_price = (
+                    st.session_state["editable_dataframe"]["edited_rows"]
+                    .get(key, {})
+                    .get("expense_price", default_value_expense_price)
+                )
+                # print("EXPENSE PRICE IS:", session_expense_price)
 
-                # TODO:
-                # Need to add all of the other columns as done right here above,
-                # then call the commit_to_database() function to commit everything
-                # to the DB (attention: do not know how to fill up the values that have
-                # not been changed by the user into the function)!
+                # STORE
+                # get the data in the corresponding cell for the "key" and the corresponding column
+                default_value_store = db_dataframe.at[key, "store"]
+                # use the default value as default in case nothing as been found in the session_state
+                session_expense_store = (
+                    st.session_state["editable_dataframe"]["edited_rows"]
+                    .get(key, {})
+                    .get("store", default_value_store)
+                )
+                # print("STORE IS:", session_expense_store)
 
-                # EXPENSE TYPE BEFORE/AFTER
-                print("BEFORE:", db_dataframe.loc[key, "expense_type"])
-                edited_df.loc[key, "expense_type"] = session_state_expense_type
-                print("AFTER:", edited_df.loc[key, "expense_type"])
+                # CITY
+                # get the data in the corresponding cell for the "key" and the corresponding column
+                default_value_city = db_dataframe.at[key, "city"]
+                # use the default value as default in case nothing as been found in the session_state
+                session_expense_city = (
+                    st.session_state["editable_dataframe"]["edited_rows"]
+                    .get(key, {})
+                    .get("city", default_value_city)
+                )
+                # print("CITY IS:", session_expense_city)
 
-                # EXPENSE PRICE BEFORE/AFTER
-                print("BEFORE:", db_dataframe.loc[key, "expense_price"])
-                edited_df.loc[key, "expense_price"] = session_state_expense_price
-                print("AFTER:", edited_df.loc[key, "expense_price"])
+                # get automatically the month
+                month_number = str(default_value_input_date.month)
+                # print("MONTH NUMBER IS:", month_number)
+                # get automatically the year
+                year_number = str(default_value_input_date.year)
+                # print("YEAR_NUMBER:", year_number)
+                # get automatically the day
+                day_number = str(default_value_input_date.day)
+                # print("DAY_NUMBER:", day_number)
+                # get the day of the week as a number (using isoweek): 1-Monday, 7-Sunday
+                isoweek_day = str(default_value_input_date.isoweekday())
+                # print("ISOWEEK_DAY:", isoweek_day)
+                # get the day of the week as a string
+                day_of_the_week = default_value_input_date.strftime("%A")
+                # print("DAY OF THE WEEK:", day_of_the_week)
+                # get the month as a three letter string
+                month_short = default_value_input_date.strftime("%b")
+                # print("MONTH SHORT", month_short)
 
-                # if db_dataframe.iloc[key, "expense_type"] != session_state_expense_type:
-                #     # Update the original dataframe with edited values
-                #     st.write("BEFORE:", db_dataframe.iloc[key]["expense_type"])
-                #     db_dataframe.iloc[key]["expense_type"] = session_state_expense_type
-                #     st.write("AFTER:", db_dataframe.iloc[key]["expense_type"])
-                # else:
-                #     pass
+                #### END TEST #####
+                ###################
 
-            # if key not found, then show me the column where the value is missing
-            except KeyError as e:
-                print(f"{e} not found")
+                # # EXPENSE TYPE
+                # # if found, save the edited value into the session_state_expense_type
+                # session_state_expense_type = st.session_state["editable_dataframe"][
+                #     "edited_rows"
+                # ][key]["expense_type"]
+                # print("ID KEY:", key, session_state_expense_type)
 
-    # show the edited table
-    st.table(edited_df)
+        # show the edited table
+        st.table(edited_df)
+
+        (
+            left_space_submit2db,
+            right_space_submit2db,
+        ) = st.columns((6, 1))
+
+        # Every form must have a submit button.
+        submit_data_editor_changes = right_space_submit2db.form_submit_button(
+            "Submit", help="Submit the changes to the database."
+        )
+
+    if submit_data_editor_changes:
+        # problem: sqlalchemy.exc.OperationalError: (MySQLdb.OperationalError) (1292...
+        # This is due to the fact that you are sending pandas dataframe to SQLAlchemy, not
+        # raw data. Need to loop through it to get only the raw input to load into the DB.
+
+        # need for a for loop (optimization later)
+        for index, row in edited_df.iterrows():
+            print("IDX IS:", index)
+            print(
+                row["input_date"],
+                row["expense_category"],
+                row["expense_type"],
+                row["expense_price"],
+                row["store"],
+                row["city"],
+                row["month_number"],
+                row["year_number"],
+                row["day_number"],
+                row["isoweek_day"],
+                row["day_of_the_week"],
+                row["month_short"],
+            )
+
+            # problem: right now I'm adding a new row when committed.
+            # The point would be to replace the row that has been edited.
+            # You need UPDATE from CRUD!
+            # This commit is if you have any rows into the "added rows" dictionary key
+            # in the session state!
+            # What you already have:
+            # - CREATE (C from CRUD)
+            # What you need:
+            # - UPDATE (U from UPDATE)
+            commit_to_database(
+                input_date=row["input_date"],
+                expense_category=row["expense_category"],
+                expense_type=row["expense_type"],
+                expense_price=row["expense_price"],
+                store=row["store"],
+                city=row["city"],
+                month_number=row["month_number"],
+                year_number=row["year_number"],
+                day_number=row["day_number"],
+                isoweek_day=row["isoweek_day"],
+                day_of_the_week=row["day_of_the_week"],
+                month_short=row["month_short"],
+                created_at=row["created_at"],
+            )
+
+        st.success("Changes committed successfully to the database.")
 
 # TODO:
 # use .iloc[key, column] to insert the value if it has been found.
