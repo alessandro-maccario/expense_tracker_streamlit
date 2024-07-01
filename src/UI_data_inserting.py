@@ -299,7 +299,10 @@ with update_read_data_db:
         # problem: sqlalchemy.exc.OperationalError: (MySQLdb.OperationalError) (1292...
         # This is due to the fact that you are sending pandas dataframe to SQLAlchemy, not
         # raw data. Need to loop through it to get only the raw input to load into the DB.
-
+        print(
+            "SESSION STATE IS:",
+            st.session_state["editable_dataframe"]["edited_rows"],
+        )
         # need for a for loop (optimization later)
         for index, row in edited_df.iterrows():
             print("IDX IS:", index)
@@ -327,21 +330,25 @@ with update_read_data_db:
             # - CREATE (C from CRUD)
             # What you need:
             # - UPDATE (U from UPDATE)
-            commit_to_database(
-                input_date=row["input_date"],
-                expense_category=row["expense_category"],
-                expense_type=row["expense_type"],
-                expense_price=row["expense_price"],
-                store=row["store"],
-                city=row["city"],
-                month_number=row["month_number"],
-                year_number=row["year_number"],
-                day_number=row["day_number"],
-                isoweek_day=row["isoweek_day"],
-                day_of_the_week=row["day_of_the_week"],
-                month_short=row["month_short"],
-                created_at=row["created_at"],
-            )
+            # This call to the commit_to_database() function
+            # will send all the rows already available from the first table
+            # back again to the DB, even if they already exists. This should
+            # work only in case we are getting rows from the "added_rows" dictionary.
+            # commit_to_database(
+            #     input_date=row["input_date"],
+            #     expense_category=row["expense_category"],
+            #     expense_type=row["expense_type"],
+            #     expense_price=row["expense_price"],
+            #     store=row["store"],
+            #     city=row["city"],
+            #     month_number=row["month_number"],
+            #     year_number=row["year_number"],
+            #     day_number=row["day_number"],
+            #     isoweek_day=row["isoweek_day"],
+            #     day_of_the_week=row["day_of_the_week"],
+            #     month_short=row["month_short"],
+            #     created_at=row["created_at"],
+            # )
 
         st.success("Changes committed successfully to the database.")
 
