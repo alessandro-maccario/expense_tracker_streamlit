@@ -70,7 +70,7 @@ def commit_to_database(
             month_short=month_short,
             created_at=created_at,
         )
-        session.add(expense)
+        session.add(expense)  # use .add_all if you want to add more rows at a time
         logger.info("About to commit session")
         session.commit()
         logger.info("Session committed successfully")
@@ -92,8 +92,12 @@ def read_from_database():
     ------
     None
     """
-    # Create a configured "Session" class
+    # Create a configured "Session" class.
+    # The bind tells the session where it should be making these transactions,
+    # therefore which database it should be connected to perform all the actions.
     Session = sessionmaker(bind=engine)
+    # The session will return an actual session object that we can use to perform
+    # actions on.
     session = Session()
 
     # query all the expenses available in the Class TEST_Expense
@@ -151,3 +155,32 @@ def read_from_database():
     )
 
     return df_expenses
+
+
+def update_database(idx: int) -> None:
+    """
+    Function to update the database if any rows has been changed.
+
+    Parameters
+    ----------
+    idx : int
+        Row index to use for updating the correct row
+
+    Returns
+    -------
+    None
+
+    """
+    # Create a configured "Session" class.
+    # The bind tells the session where it should be making these transactions,
+    # therefore which database it should be connected to perform all the actions.
+    Session = sessionmaker(bind=engine)
+    # The session will return an actual session object that we can use to perform
+    # actions on.
+    session = Session()
+
+    # query all the expenses available in the Class TEST_Expense that corresponds to a
+    # single id value and update that single row with the newest information
+    expense = session.query(TEST_Expense).filter_by(id=idx).one_or_none()
+
+    # assign the new values to the previous row
