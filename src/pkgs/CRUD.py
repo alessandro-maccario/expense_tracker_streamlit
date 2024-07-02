@@ -157,7 +157,22 @@ def read_from_database():
     return df_expenses
 
 
-def update_database(idx: int) -> None:
+def update_database(
+    idx: int,
+    input_date: datetime,
+    expense_category: str,
+    expense_type: str,
+    expense_price: float,
+    store: str,
+    city: str,
+    month_number: str,
+    year_number: str,
+    day_number: str,
+    isoweek_day: str,
+    day_of_the_week: str,
+    month_short: str,
+    created_at: datetime,
+) -> None:
     """
     Function to update the database if any rows has been changed.
 
@@ -181,6 +196,29 @@ def update_database(idx: int) -> None:
 
     # query all the expenses available in the Class TEST_Expense that corresponds to a
     # single id value and update that single row with the newest information
-    expense = session.query(TEST_Expense).filter_by(id=idx).one_or_none()
+    expense = session.query(TEST_Expense).get(id=idx)
 
+    changes = {
+        "input_date": input_date,
+        "expense_category": expense_category,
+        "expense_type": expense_type,
+        "expense_price": expense_price,
+        "store": store,
+        "city": city,
+        "month_number": month_number,
+        "year_number": year_number,
+        "day_number": day_number,
+        "isoweek_day": isoweek_day,
+        "day_of_the_week": day_of_the_week,
+        "month_short": month_short,
+        "created_at": created_at,
+    }
+
+    # https://stackoverflow.com/questions/47735329/updating-a-row-using-sqlalchemy-orm
     # assign the new values to the previous row
+    for key, value in changes.items():
+        setattr(expense, key, value)
+
+    # expense = session.query(TEST_Expense).filter_by(id=idx).one_or_none()
+
+    return
