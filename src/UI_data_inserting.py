@@ -12,7 +12,7 @@ from pkgs.sqlalchemy_db import (
     TEST_Expense,
     engine,
 )
-from pkgs.CRUD import commit_to_database, read_from_database
+from pkgs.CRUD import commit_to_database, read_from_database, update_database
 from datetime import datetime
 
 # TODO:
@@ -303,22 +303,45 @@ with update_read_data_db:
             "SESSION STATE IS:",
             st.session_state["editable_dataframe"]["edited_rows"],
         )
+
         # need for a for loop (optimization later)
         for index, row in edited_df.iterrows():
-            print("IDX IS:", index)
-            print(
-                row["input_date"],
-                row["expense_category"],
-                row["expense_type"],
-                row["expense_price"],
-                row["store"],
-                row["city"],
-                row["month_number"],
-                row["year_number"],
-                row["day_number"],
-                row["isoweek_day"],
-                row["day_of_the_week"],
-                row["month_short"],
+            # print("INDEX IS:", index)
+            # print("STREAMLIT TABLE IDX IS:", index)
+            # print("DATABASE TABLE IDX IS:", row["id"])
+            # print(
+            #     index,
+            #     row["input_date"],
+            #     row["expense_category"],
+            #     row["expense_type"],
+            #     row["expense_price"],
+            #     row["store"],
+            #     row["city"],
+            #     row["month_number"],
+            #     row["year_number"],
+            #     row["day_number"],
+            #     row["isoweek_day"],
+            #     row["day_of_the_week"],
+            #     row["month_short"],
+            #     row["created_at"],
+            # )
+
+            # update the database row
+            update_database(
+                idx=row["id"],
+                input_date=row["input_date"],
+                expense_category=row["expense_category"],
+                expense_type=row["expense_type"],
+                expense_price=row["expense_price"],
+                store=row["store"],
+                city=row["city"],
+                month_number=row["month_number"],
+                year_number=row["year_number"],
+                day_number=row["day_number"],
+                isoweek_day=row["isoweek_day"],
+                day_of_the_week=row["day_of_the_week"],
+                month_short=row["month_short"],
+                created_at=row["created_at"],
             )
 
             # problem: right now I'm adding a new row when committed.
@@ -334,6 +357,9 @@ with update_read_data_db:
             # will send all the rows already available from the first table
             # back again to the DB, even if they already exists. This should
             # work only in case we are getting rows from the "added_rows" dictionary.
+
+            # row.at[index, "input_date"] = row["input_date"]
+
             # commit_to_database(
             #     input_date=row["input_date"],
             #     expense_category=row["expense_category"],
