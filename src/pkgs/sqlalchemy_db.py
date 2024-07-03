@@ -54,7 +54,7 @@ class TEST_Expense(Base):  # class name, usually singular
     # create columns
     id = Column(Integer, primary_key=True, autoincrement="auto")
     input_date = Column(Date)
-    expense_category = Column(String(15))
+    expense_category = Column(String(50))
     expense_type = Column(String(30))
     expense_price = Column(Float)
     store = Column(String(30))
