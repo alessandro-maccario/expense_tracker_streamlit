@@ -118,6 +118,7 @@ def read_from_database():
         # add all the information regarding the specific row
         if row_id_expense not in dict_expenses:
             dict_expenses[row_id_expense] = [
+                expense.id,
                 expense.input_date,
                 expense.expense_category,
                 expense.expense_type,
@@ -138,6 +139,7 @@ def read_from_database():
         dict_expenses,
         orient="index",
         columns=[
+            "id",
             "input_date",
             "expense_category",
             "expense_type",
@@ -196,9 +198,11 @@ def update_database(
 
     # query all the expenses available in the Class TEST_Expense that corresponds to a
     # single id value and update that single row with the newest information
-    expense = session.query(TEST_Expense).get(id=idx)
+    expense = session.query(TEST_Expense).filter(TEST_Expense.id == idx).first()
+    print(expense)
 
     changes = {
+        "id": idx,
         "input_date": input_date,
         "expense_category": expense_category,
         "expense_type": expense_type,
@@ -217,8 +221,17 @@ def update_database(
     # https://stackoverflow.com/questions/47735329/updating-a-row-using-sqlalchemy-orm
     # assign the new values to the previous row
     for key, value in changes.items():
+        # print("KEY, VALUE:", key, value)
+        # this read as: set the attribute to the object "expense"
+        # assigning to the "key" the specific "value"
         setattr(expense, key, value)
 
+    # commit the changes
+    # For a broader explanation, check:
+    # - https://medium.com/@oba2311/sqlalchemy-whats-the-difference-between-a-flush-and-commit-baec6c2410a9
+    session.commit()
+
+    # session.flush()
     # expense = session.query(TEST_Expense).filter_by(id=idx).one_or_none()
 
     return
