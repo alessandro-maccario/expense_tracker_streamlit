@@ -235,3 +235,41 @@ def update_database(
     # expense = session.query(TEST_Expense).filter_by(id=idx).one_or_none()
 
     return
+
+
+def delete_from_database(idx) -> None:
+    """
+        Function to delete a single/multiple rows from the database table
+        via indexes.
+
+    Parameters
+    ----------
+    idx : int
+        Index of the row to be deleted.
+
+    Returns
+    -------
+    None
+
+    """
+    # Create a configured "Session" class.
+    # The bind tells the session where it should be making these transactions,
+    # therefore which database it should be connected to perform all the actions.
+    Session = sessionmaker(bind=engine)
+    # The session will return an actual session object that we can use to perform
+    # actions on.
+    session = Session()
+
+    # delete SQLAlchemy constructor
+    # https://docs.sqlalchemy.org/en/20/tutorial/data_update.html
+    deletion_query = session.query(TEST_Expense).filter(TEST_Expense.id == idx).delete()
+    print("DELETED ROW:", deletion_query)
+    # delete_expense = session.query(TEST_Expense).filter(TEST_Expense.id == idx).first()
+    # session.delete(delete_expense)
+
+    # commit the changes
+    # For a broader explanation, check:
+    # - https://medium.com/@oba2311/sqlalchemy-whats-the-difference-between-a-flush-and-commit-baec6c2410a9
+    session.commit()
+
+    return
