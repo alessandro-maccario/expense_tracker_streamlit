@@ -12,7 +12,12 @@ from pkgs.sqlalchemy_db import (
     TEST_Expense,
     engine,
 )
-from pkgs.CRUD import commit_to_database, read_from_database, update_database
+from pkgs.CRUD import (
+    commit_to_database,
+    read_from_database,
+    update_database,
+    delete_from_database,
+)
 from datetime import datetime
 
 # TODO:
@@ -290,6 +295,14 @@ with update_read_data_db:
             right_space_submit2db,
         ) = st.columns((6, 1))
 
+        print("EDITED DF IS:", db_dataframe, "\n")
+
+        # save the edited df before it gets modified to keep the
+        # id of each row. This will be used with the "deleted" ids,
+        # joined and the right id table is then fetched and used for removing
+        # the specific row from the database table
+        temp_edited_df = db_dataframe.copy(deep=True)
+
         # Every form must have a submit button.
         submit_data_editor_changes = right_space_submit2db.form_submit_button(
             "Submit", help="Submit the changes to the database."
@@ -302,7 +315,28 @@ with update_read_data_db:
         print(
             "SESSION STATE IS:",
             st.session_state["editable_dataframe"]["edited_rows"],
+            "DELETED ROWS ARE:",
+            st.session_state["editable_dataframe"],
         )
+
+        # save the indexes from the edited_df that have to be then dropped
+        temp_index_list_to_drop = []
+        if st.session_state["editable_dataframe"]["deleted_rows"]:
+            print("###### INSIDE ######")
+            for each_deleted_row in st.session_state["editable_dataframe"][
+                "deleted_rows"
+            ]:
+                print("###### INSIDE THE LOOP ######")
+                print("TEMP EDITED DF IS:", temp_edited_df, "\n")
+                # Pandas filter() by index
+                edited_df_index_filtered = temp_edited_df.filter(
+                    items=[each_deleted_row], axis=0
+                )
+                # get only the index value connected to each row
+                temp_index_list_to_drop.append(edited_df_index_filtered["id"][0])
+        else:
+            pass
+        print("LIST OF INDEXES TO BE DROPPED:", temp_index_list_to_drop)
 
         # need for a for loop (optimization later)
         for index, row in edited_df.iterrows():
@@ -352,7 +386,7 @@ with update_read_data_db:
             # What you already have:
             # - CREATE (C from CRUD)
             # What you need:
-            # - UPDATE (U from UPDATE)
+            # - UPDATE (U from UPDATE) -> DONE
             # This call to the commit_to_database() function
             # will send all the rows already available from the first table
             # back again to the DB, even if they already exists. This should
@@ -375,6 +409,24 @@ with update_read_data_db:
             #     month_short=row["month_short"],
             #     created_at=row["created_at"],
             # )
+
+        # for index, row in edited_df.iterrows():
+        #     print(
+        #         "BEFORE -> CORRESPONDING ROW ID IS:",
+        #         row["id"],
+        #         "\n",
+        #         "AFTER -> id from the table",
+        #         index,
+        #     )
+        # print("BEFORE -> CORRESPONDING ROW ID IS:", row["id"])
+        # check if a row/some rows has/have been deleted
+        if st.session_state["editable_dataframe"]["deleted_rows"]:
+            for each_row_idx in temp_index_list_to_drop:
+                # for each_row_idx in st.session_state["editable_dataframe"]["deleted_rows"]:
+                # print("CORRESPONDING ROW ID IS:", row["id"])
+                delete_from_database(each_row_idx)
+        else:
+            pass
 
         st.success("Changes committed successfully to the database.")
 
