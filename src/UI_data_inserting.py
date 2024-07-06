@@ -169,7 +169,7 @@ with create_read_data_db:
 # update the database
 with update_read_data_db:
     # create the form to add an item and send the data to the db
-    with st.form("update_read_data_db"):
+    with st.form("update_read_data_db", clear_on_submit=True):
         st.markdown("##### Edit the dataframe")
 
         # read from the database
@@ -295,7 +295,7 @@ with update_read_data_db:
             right_space_submit2db,
         ) = st.columns((6, 1))
 
-        print("EDITED DF IS:", db_dataframe, "\n")
+        # print("EDITED DF IS:", db_dataframe, "\n")
 
         # save the edited df before it gets modified to keep the
         # id of each row. This will be used with the "deleted" ids,
@@ -327,97 +327,169 @@ with update_read_data_db:
                 "deleted_rows"
             ]:
                 print("###### INSIDE THE LOOP ######")
-                print("TEMP EDITED DF IS:", temp_edited_df, "\n")
+                # print("TEMP EDITED DF IS:", temp_edited_df, "\n")
                 # Pandas filter() by index
                 edited_df_index_filtered = temp_edited_df.filter(
                     items=[each_deleted_row], axis=0
                 )
                 # get only the index value connected to each row
-                temp_index_list_to_drop.append(edited_df_index_filtered["id"][0])
+                # print("EDITED INDEX TO BE REMOVED IS:", edited_df_index_filtered["id"].iloc[0])
+                temp_index_list_to_drop.append(edited_df_index_filtered["id"].iloc[0])
         else:
             pass
         print("LIST OF INDEXES TO BE DROPPED:", temp_index_list_to_drop)
 
-        # need for a for loop (optimization later)
-        for index, row in edited_df.iterrows():
-            # print("INDEX IS:", index)
-            # print("STREAMLIT TABLE IDX IS:", index)
-            # print("DATABASE TABLE IDX IS:", row["id"])
-            # print(
-            #     index,
-            #     row["input_date"],
-            #     row["expense_category"],
-            #     row["expense_type"],
-            #     row["expense_price"],
-            #     row["store"],
-            #     row["city"],
-            #     row["month_number"],
-            #     row["year_number"],
-            #     row["day_number"],
-            #     row["isoweek_day"],
-            #     row["day_of_the_week"],
-            #     row["month_short"],
-            #     row["created_at"],
-            # )
+        ##### TEST ######
+        # ADDING NEW ROWS
+        # if some new rows have been added, then, let's add them to the database table
+        if st.session_state["editable_dataframe"]["added_rows"]:
+            # check if each element is not None
+            for attribute in st.session_state["editable_dataframe"]["added_rows"]:
+                # print("ATTRIBUTE IS:", type(attribute))
+                #####################################
+                ####### PROBLEM: WE WERE LOOPING OVER A SINGLE ROW! #############
+                #### We have to loop over each single element in a single row!
+                # attribute = to a single row
+                # PROBLEM: https://realpython.com/iterate-through-dictionary-python/
+                for key in attribute:
+                    print("KEY:", key, ",", "ATTRIBUTE:", attribute[key])
+                    if key == "input_date":
+                        input_date_value = attribute[key]
+                    elif key == "expense_category":
+                        expense_category = attribute[key]
+                    elif key == "expense_type":
+                        input_item_name = attribute[key]
+                    elif key == "expense_price":
+                        input_price = attribute[key]
+                    elif key == "store":
+                        store = attribute[key]
+                    elif key == "city":
+                        city = attribute[key]
+                    else:
+                        expense_category = None
+                        input_item_name = None
+                        input_price = None
+                        store = None
+                        city = None
 
-            # update the database row
-            update_database(
-                idx=row["id"],
-                input_date=row["input_date"],
-                expense_category=row["expense_category"],
-                expense_type=row["expense_type"],
-                expense_price=row["expense_price"],
-                store=row["store"],
-                city=row["city"],
-                month_number=row["month_number"],
-                year_number=row["year_number"],
-                day_number=row["day_number"],
-                isoweek_day=row["isoweek_day"],
-                day_of_the_week=row["day_of_the_week"],
-                month_short=row["month_short"],
-                created_at=row["created_at"],
-            )
+                month_number = datetime.strptime(input_date_value, "%Y-%m-%d").month
+                year_number = datetime.strptime(input_date_value, "%Y-%m-%d").year
+                day_number = datetime.strptime(input_date_value, "%Y-%m-%d").day
+                isoweek_day = datetime.strptime(
+                    input_date_value, "%Y-%m-%d"
+                ).isoweekday()
+                day_of_the_week = datetime.strptime(
+                    input_date_value, "%Y-%m-%d"
+                ).strftime("%A")
+                month_short = datetime.strptime(input_date_value, "%Y-%m-%d").strftime(
+                    "%b"
+                )
+                created_at = datetime.now()
 
-            # problem: right now I'm adding a new row when committed.
-            # The point would be to replace the row that has been edited.
-            # You need UPDATE from CRUD!
-            # This commit is if you have any rows into the "added rows" dictionary key
-            # in the session state!
-            # What you already have:
-            # - CREATE (C from CRUD)
-            # What you need:
-            # - UPDATE (U from UPDATE) -> DONE
-            # This call to the commit_to_database() function
-            # will send all the rows already available from the first table
-            # back again to the DB, even if they already exists. This should
-            # work only in case we are getting rows from the "added_rows" dictionary.
+                print("month_number IS:", month_number)
+                # commit the new row to the database table
+                # Now commit the data to the database
+                commit_to_database(
+                    input_date_value,
+                    expense_category,
+                    input_item_name,
+                    input_price,
+                    store,
+                    city,
+                    month_number,
+                    year_number,
+                    day_number,
+                    isoweek_day,
+                    day_of_the_week,
+                    month_short,
+                    created_at,
+                )
 
-            # row.at[index, "input_date"] = row["input_date"]
+        ####### END TEST FOR ADDING ROWS#########
 
-            # commit_to_database(
-            #     input_date=row["input_date"],
-            #     expense_category=row["expense_category"],
-            #     expense_type=row["expense_type"],
-            #     expense_price=row["expense_price"],
-            #     store=row["store"],
-            #     city=row["city"],
-            #     month_number=row["month_number"],
-            #     year_number=row["year_number"],
-            #     day_number=row["day_number"],
-            #     isoweek_day=row["isoweek_day"],
-            #     day_of_the_week=row["day_of_the_week"],
-            #     month_short=row["month_short"],
-            #     created_at=row["created_at"],
-            # )
+        ####### TEST FOR UPDATING ROWS ##########
+        # if some new rows have been added, then, let's add them to the database table
+        if st.session_state["editable_dataframe"]["edited_rows"]:
+            # need for a for loop (optimization later)
+            for index, row in edited_df.iterrows():
+                # print("INDEX IS:", index)
+                # print("STREAMLIT TABLE IDX IS:", index)
+                # print("DATABASE TABLE IDX IS:", row["id"])
+                # print(
+                #     index,
+                #     row["input_date"],
+                #     row["expense_category"],
+                #     row["expense_type"],
+                #     row["expense_price"],
+                #     row["store"],
+                #     row["city"],
+                #     row["month_number"],
+                #     row["year_number"],
+                #     row["day_number"],
+                #     row["isoweek_day"],
+                #     row["day_of_the_week"],
+                #     row["month_short"],
+                #     row["created_at"],
+                # )
 
-        # for index, row in edited_df.iterrows():
-        #     print(
-        #         "BEFORE -> CORRESPONDING ROW ID IS:",
-        #         row["id"],
-        #         "\n",
-        #         "AFTER -> id from the table",
-        #         index,
-        #     )
+                # update the database row
+                update_database(
+                    idx=row["id"],
+                    input_date=row["input_date"],
+                    expense_category=row["expense_category"],
+                    expense_type=row["expense_type"],
+                    expense_price=row["expense_price"],
+                    store=row["store"],
+                    city=row["city"],
+                    month_number=row["month_number"],
+                    year_number=row["year_number"],
+                    day_number=row["day_number"],
+                    isoweek_day=row["isoweek_day"],
+                    day_of_the_week=row["day_of_the_week"],
+                    month_short=row["month_short"],
+                    created_at=row["created_at"],
+                )
+
+                # problem: right now I'm adding a new row when committed.
+                # The point would be to replace the row that has been edited.
+                # You need UPDATE from CRUD!
+                # This commit is if you have any rows into the "added rows" dictionary key
+                # in the session state!
+                # What you already have:
+                # - CREATE (C from CRUD)
+                # What you need:
+                # - UPDATE (U from UPDATE) -> DONE
+                # This call to the commit_to_database() function
+                # will send all the rows already available from the first table
+                # back again to the DB, even if they already exists. This should
+                # work only in case we are getting rows from the "added_rows" dictionary.
+
+                # row.at[index, "input_date"] = row["input_date"]
+
+                # commit_to_database(
+                #     input_date=row["input_date"],
+                #     expense_category=row["expense_category"],
+                #     expense_type=row["expense_type"],
+                #     expense_price=row["expense_price"],
+                #     store=row["store"],
+                #     city=row["city"],
+                #     month_number=row["month_number"],
+                #     year_number=row["year_number"],
+                #     day_number=row["day_number"],
+                #     isoweek_day=row["isoweek_day"],
+                #     day_of_the_week=row["day_of_the_week"],
+                #     month_short=row["month_short"],
+                #     created_at=row["created_at"],
+                # )
+
+            # for index, row in edited_df.iterrows():
+            #     print(
+            #         "BEFORE -> CORRESPONDING ROW ID IS:",
+            #         row["id"],
+            #         "\n",
+            #         "AFTER -> id from the table",
+            #         index,
+            #     )
         # print("BEFORE -> CORRESPONDING ROW ID IS:", row["id"])
         # check if a row/some rows has/have been deleted
         if st.session_state["editable_dataframe"]["deleted_rows"]:
@@ -429,6 +501,7 @@ with update_read_data_db:
             pass
 
         st.success("Changes committed successfully to the database.")
+        st.rerun()
 
 # TODO:
 # use .iloc[key, column] to insert the value if it has been found.
