@@ -201,8 +201,6 @@ with update_read_data_db:
             if key in st.session_state["editable_dataframe"]["edited_rows"]:
                 print("------ ID KEYS AVAILABLE -------")
 
-                #################
-                ##### TEST ######
                 # INPUT DATE
                 # get the data in the corresponding cell for the "key" and the corresponding column
                 default_value_input_date = db_dataframe.at[key, "input_date"]
@@ -212,7 +210,6 @@ with update_read_data_db:
                     .get(key, {})
                     .get("input_date", default_value_input_date)
                 )
-                # print("INPUT DATE IS:", session_input_date)
 
                 # EXPENSE TYPE
                 # get the data in the corresponding cell for the "key" and the corresponding column
@@ -223,7 +220,6 @@ with update_read_data_db:
                     .get(key, {})
                     .get("expense_type", default_value_expense_type)
                 )
-                # print("EXPENSE TYPE IS:", session_expense_type)
 
                 # EXPENSE PRICE
                 # get the data in the corresponding cell for the "key" and the corresponding column
@@ -234,7 +230,6 @@ with update_read_data_db:
                     .get(key, {})
                     .get("expense_price", default_value_expense_price)
                 )
-                # print("EXPENSE PRICE IS:", session_expense_price)
 
                 # STORE
                 # get the data in the corresponding cell for the "key" and the corresponding column
@@ -245,7 +240,6 @@ with update_read_data_db:
                     .get(key, {})
                     .get("store", default_value_store)
                 )
-                # print("STORE IS:", session_expense_store)
 
                 # CITY
                 # get the data in the corresponding cell for the "key" and the corresponding column
@@ -260,32 +254,18 @@ with update_read_data_db:
 
                 # get automatically the month
                 month_number = str(default_value_input_date.month)
-                # print("MONTH NUMBER IS:", month_number)
                 # get automatically the year
                 year_number = str(default_value_input_date.year)
-                # print("YEAR_NUMBER:", year_number)
                 # get automatically the day
                 day_number = str(default_value_input_date.day)
-                # print("DAY_NUMBER:", day_number)
                 # get the day of the week as a number (using isoweek): 1-Monday, 7-Sunday
                 isoweek_day = str(default_value_input_date.isoweekday())
-                # print("ISOWEEK_DAY:", isoweek_day)
                 # get the day of the week as a string
                 day_of_the_week = default_value_input_date.strftime("%A")
-                # print("DAY OF THE WEEK:", day_of_the_week)
                 # get the month as a three letter string
                 month_short = default_value_input_date.strftime("%b")
-                # print("MONTH SHORT", month_short)
 
-                #### END TEST #####
-                ###################
-
-                # # EXPENSE TYPE
-                # # if found, save the edited value into the session_state_expense_type
-                # session_state_expense_type = st.session_state["editable_dataframe"][
-                #     "edited_rows"
-                # ][key]["expense_type"]
-                # print("ID KEY:", key, session_state_expense_type)
+                #### END #####
 
         # show the edited table
         st.table(edited_df)
@@ -327,29 +307,22 @@ with update_read_data_db:
                 "deleted_rows"
             ]:
                 print("###### INSIDE THE LOOP ######")
-                # print("TEMP EDITED DF IS:", temp_edited_df, "\n")
                 # Pandas filter() by index
                 edited_df_index_filtered = temp_edited_df.filter(
                     items=[each_deleted_row], axis=0
                 )
                 # get only the index value connected to each row
-                # print("EDITED INDEX TO BE REMOVED IS:", edited_df_index_filtered["id"].iloc[0])
                 temp_index_list_to_drop.append(edited_df_index_filtered["id"].iloc[0])
         else:
             pass
         print("LIST OF INDEXES TO BE DROPPED:", temp_index_list_to_drop)
 
-        ##### TEST ######
         # ADDING NEW ROWS
         # if some new rows have been added, then, let's add them to the database table
         if st.session_state["editable_dataframe"]["added_rows"]:
             # check if each element is not None
             for attribute in st.session_state["editable_dataframe"]["added_rows"]:
-                # print("ATTRIBUTE IS:", type(attribute))
-                #####################################
-                ####### PROBLEM: WE WERE LOOPING OVER A SINGLE ROW! #############
-                #### We have to loop over each single element in a single row!
-                # attribute = to a single row
+                # attribute = to a single row. Need to loop on each single item in each single row
                 # PROBLEM: https://realpython.com/iterate-through-dictionary-python/
                 for key in attribute:
                     print("KEY:", key, ",", "ATTRIBUTE:", attribute[key])
@@ -405,33 +378,13 @@ with update_read_data_db:
                     created_at,
                 )
 
-        ####### END TEST FOR ADDING ROWS#########
+        ####### END ADDING ROWS#########
 
-        ####### TEST FOR UPDATING ROWS ##########
+        ####### UPDATING ROWS ##########
         # if some new rows have been added, then, let's add them to the database table
         if st.session_state["editable_dataframe"]["edited_rows"]:
             # need for a for loop (optimization later)
             for index, row in edited_df.iterrows():
-                # print("INDEX IS:", index)
-                # print("STREAMLIT TABLE IDX IS:", index)
-                # print("DATABASE TABLE IDX IS:", row["id"])
-                # print(
-                #     index,
-                #     row["input_date"],
-                #     row["expense_category"],
-                #     row["expense_type"],
-                #     row["expense_price"],
-                #     row["store"],
-                #     row["city"],
-                #     row["month_number"],
-                #     row["year_number"],
-                #     row["day_number"],
-                #     row["isoweek_day"],
-                #     row["day_of_the_week"],
-                #     row["month_short"],
-                #     row["created_at"],
-                # )
-
                 # update the database row
                 update_database(
                     idx=row["id"],
@@ -450,58 +403,23 @@ with update_read_data_db:
                     created_at=row["created_at"],
                 )
 
-                # problem: right now I'm adding a new row when committed.
-                # The point would be to replace the row that has been edited.
-                # You need UPDATE from CRUD!
-                # This commit is if you have any rows into the "added rows" dictionary key
-                # in the session state!
-                # What you already have:
-                # - CREATE (C from CRUD)
-                # What you need:
-                # - UPDATE (U from UPDATE) -> DONE
-                # This call to the commit_to_database() function
-                # will send all the rows already available from the first table
-                # back again to the DB, even if they already exists. This should
-                # work only in case we are getting rows from the "added_rows" dictionary.
-
-                # row.at[index, "input_date"] = row["input_date"]
-
-                # commit_to_database(
-                #     input_date=row["input_date"],
-                #     expense_category=row["expense_category"],
-                #     expense_type=row["expense_type"],
-                #     expense_price=row["expense_price"],
-                #     store=row["store"],
-                #     city=row["city"],
-                #     month_number=row["month_number"],
-                #     year_number=row["year_number"],
-                #     day_number=row["day_number"],
-                #     isoweek_day=row["isoweek_day"],
-                #     day_of_the_week=row["day_of_the_week"],
-                #     month_short=row["month_short"],
-                #     created_at=row["created_at"],
-                # )
-
-            # for index, row in edited_df.iterrows():
-            #     print(
-            #         "BEFORE -> CORRESPONDING ROW ID IS:",
-            #         row["id"],
-            #         "\n",
-            #         "AFTER -> id from the table",
-            #         index,
-            #     )
-        # print("BEFORE -> CORRESPONDING ROW ID IS:", row["id"])
         # check if a row/some rows has/have been deleted
         if st.session_state["editable_dataframe"]["deleted_rows"]:
             for each_row_idx in temp_index_list_to_drop:
-                # for each_row_idx in st.session_state["editable_dataframe"]["deleted_rows"]:
-                # print("CORRESPONDING ROW ID IS:", row["id"])
+                # then call the function to delete the row
                 delete_from_database(each_row_idx)
         else:
             pass
 
         st.success("Changes committed successfully to the database.")
         st.rerun()
+
+# TODO:
+# - remove some columns from the "update" tab expense streamlit
+# - add dropdown menu to the expense_category column
+# - refactor code
+# - think (using gpt as well) how to rebuild the database!
+
 
 # TODO:
 # use .iloc[key, column] to insert the value if it has been found.
