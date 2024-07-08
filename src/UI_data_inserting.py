@@ -185,8 +185,35 @@ with update_read_data_db:
             num_rows="dynamic",
             use_container_width=True,
             column_config={
+                "id": None,  # hide the column even though it's there,
+                "month_number": None,
+                "year_number": None,
+                "day_number": None,
+                "isoweek_day": None,
+                "day_of_the_week": None,
+                "month_short": None,
                 "input_date": st.column_config.DateColumn(
                     format="YYYY-MM-DD", required=True
+                ),
+                "expense_category": st.column_config.SelectboxColumn(
+                    options=[
+                        "Cleaning Producs",
+                        "Clothes",
+                        "Drugstore product",
+                        "Entertainement",
+                        "Food",
+                        "Gaming",
+                        "Gas",
+                        "Hairdresser",
+                        "Home Expenses",
+                        "Hotel",
+                        "Knowledge",
+                        "Others",
+                        "Restaurants",
+                        "Transportation",
+                    ],
+                    required=True,
+                    default="Food",
                 ),
             },
         )
@@ -250,7 +277,6 @@ with update_read_data_db:
                     .get(key, {})
                     .get("city", default_value_city)
                 )
-                # print("CITY IS:", session_expense_city)
 
                 # get automatically the month
                 month_number = str(default_value_input_date.month)
@@ -274,8 +300,6 @@ with update_read_data_db:
             left_space_submit2db,
             right_space_submit2db,
         ) = st.columns((6, 1))
-
-        # print("EDITED DF IS:", db_dataframe, "\n")
 
         # save the edited df before it gets modified to keep the
         # id of each row. This will be used with the "deleted" ids,
@@ -345,21 +369,27 @@ with update_read_data_db:
                         store = None
                         city = None
 
+                # get the month
                 month_number = datetime.strptime(input_date_value, "%Y-%m-%d").month
+                # get the year
                 year_number = datetime.strptime(input_date_value, "%Y-%m-%d").year
+                # get the day_number
                 day_number = datetime.strptime(input_date_value, "%Y-%m-%d").day
+                # get the isoweek
                 isoweek_day = datetime.strptime(
                     input_date_value, "%Y-%m-%d"
                 ).isoweekday()
+                # get the day of the week
                 day_of_the_week = datetime.strptime(
                     input_date_value, "%Y-%m-%d"
                 ).strftime("%A")
+                # get the short name of the month (for instance: "Jan")
                 month_short = datetime.strptime(input_date_value, "%Y-%m-%d").strftime(
                     "%b"
                 )
+                # get the current time
                 created_at = datetime.now()
 
-                print("month_number IS:", month_number)
                 # commit the new row to the database table
                 # Now commit the data to the database
                 commit_to_database(
@@ -415,7 +445,6 @@ with update_read_data_db:
         st.rerun()
 
 # TODO:
-# - remove some columns from the "update" tab expense streamlit
 # - add dropdown menu to the expense_category column
 # - refactor code
 # - think (using gpt as well) how to rebuild the database!
