@@ -21,7 +21,7 @@ def convert_df(df: pd.DataFrame) -> pd.DataFrame:
 # --- Main code --- #
 
 # set the page default setting to wide
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title="Dashboard", page_icon="🔎")
 
 # sidebar
 with st.sidebar:
