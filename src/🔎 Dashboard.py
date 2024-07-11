@@ -84,20 +84,6 @@ if uploaded_file is not None:
     # sort the data by date
     df_expenses.sort_values(by=["date"], inplace=True)
 
-    ###############################################
-
-    # """
-    #     Define what has to be shown in each tab.
-
-    #     Logic behind:
-    #         - Define the overall tab system.
-    #         - Create the st.columns inside the single tab.
-    #         - Assign those columns to the specific elements
-    #         that you want to order on the canvas.
-    #         - In the corresponding functions, when you plot for instance
-    #         you need to use the new variable created for the column.
-    # """
-
     # Define what has to be shown in the first tab
     with overall_overview_tab1:
         # Inside the first tab, you need to define columns, in case
@@ -129,6 +115,7 @@ if uploaded_file is not None:
             category_selection = select_category_dropdown.selectbox(
                 "Select the category:", categories_with_data.index.unique()
             )
+            # print(category_selection)
 
         # --- Metrics --- #
         # --- Create columns to position the metrics --- #
@@ -147,6 +134,8 @@ if uploaded_file is not None:
             metric2_total_amount_spent_category = metric_total_amount_spent_category(
                 df_expenses, category_selection, today_date, past_date
             )
+        with metric3:
+            metric3 = metric_total_income(df_expenses, today_date, past_date)
         # ###################################################
         # --- Plots --- #
         # Create columns to position the plots: create a container
@@ -296,11 +285,11 @@ if uploaded_file is not None:
     with open(r"C:\solutions\learning_python\expense_tracker\src\style\style.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# TODO:
-# Continue with the README:
-# https://github.com/alessandro-maccario/expense_tracker_streamlit/blob/main/README.md
-
 else:
     st.text(
         "To start the dashboard, please, upload a file using the button on the sidebar."
     )
+
+# TODO:
+# Continue with the README:
+# https://github.com/alessandro-maccario/expense_tracker_streamlit/blob/main/README.md
