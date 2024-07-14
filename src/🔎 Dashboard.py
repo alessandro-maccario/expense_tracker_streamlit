@@ -8,8 +8,19 @@
 import pandas as pd
 import streamlit as st
 from pkgs.global_vars import today, past
-from pkgs.metrics import *
-from pkgs.plots import *
+from pkgs.metrics import (
+    total_expenses_timeframe, 
+    metric_total_expenses_timeframe, 
+    metric_total_amount_spent, 
+    metric_total_amount_spent_category, 
+    metric_total_income)
+    # metric_total_investment)
+from pkgs.plots import (
+    monthly_report_plot, 
+    plot_bar_chart_category_total, 
+    plot_donut_chart_store_total, 
+    plot_bar_chart_expenses_per_month,
+    plot_waterfall_per_month)
 
 
 # REQUIRED by Streamlit for downloading the data in the correct format:
@@ -77,8 +88,8 @@ with st.sidebar:
 # otherwise show the hint to upload it.
 if uploaded_file is not None:
     # define three tabs where to insert the plots
-    overall_overview_tab1, monthly_trend_tab2, monthly_comparison_tab3 = st.tabs(
-        ["📈 Overall Overview", "👓 Monthly Overview", "👨🏼‍🤝‍👨🏼 Monthly comparison"]
+    overall_overview_tab1, monthly_trend_tab2, monthly_comparison_tab3, monthly_breakdown_tab4 = st.tabs(
+        ["📈 Overall Overview", "👓 Monthly Overview", "👨🏼‍🤝‍👨🏼 Monthly comparison", "🧾 Monthly Breakdown"]
     )
 
     # sort the data by date
@@ -111,20 +122,25 @@ if uploaded_file is not None:
                 )
             ).sort_values(ascending=False)
 
+            # remove the "income" value
+            categories_with_data = categories_with_data[
+                ~categories_with_data.index.isin(["income", "investment", "savings"])
+            ]
+
             # let the user select the category
             category_selection = select_category_dropdown.selectbox(
                 "Select the category:", categories_with_data.index.unique()
             )
-            # print(category_selection)
+            print("CATEGORY WITH DATA IS:", categories_with_data)
 
         # --- Metrics --- #
         # --- Create columns to position the metrics --- #
         (
             metric1_total_amount_spent,
             metric2_total_amount_spent_category,
-            metric3,
-            metric4,
-        ) = st.columns(4)
+            metric3_income,
+            # metric4_investment,
+        ) = st.columns(3)
 
         with metric1_total_amount_spent:
             metric1_total_amount_spent = metric_total_amount_spent(
@@ -134,8 +150,11 @@ if uploaded_file is not None:
             metric2_total_amount_spent_category = metric_total_amount_spent_category(
                 df_expenses, category_selection, today_date, past_date
             )
-        with metric3:
-            metric3 = metric_total_income(df_expenses, today_date, past_date)
+        with metric3_income:
+            metric3_income = metric_total_income(df_expenses, today_date, past_date)
+
+        # with metric4_investment:
+        #     metric4_investment = metric_total_investment(df_expenses)
         # ###################################################
         # --- Plots --- #
         # Create columns to position the plots: create a container
@@ -173,7 +192,7 @@ if uploaded_file is not None:
 
         with selector_year1:
             year_selection = selector_year1.selectbox(
-                "Monthly Report - Year",
+                "Monthly Report - Year - Left",
                 df_expenses["year"].unique(),
             )
             # filter the df based on the selection of the user
@@ -182,12 +201,12 @@ if uploaded_file is not None:
             ]
             # selection box for letting the user filter the month
             monthly_report_choose_month = selector_month1.selectbox(
-                "Monthly Report - Month",
+                "Monthly Report - Month - Left",
                 df_monthly_report_choose_year["month"].unique(),
             )
         with selector_year2:
             year_selection2 = selector_year2.selectbox(
-                "Monthly Report - Year2",
+                "Monthly Report - Year - Right",
                 df_expenses["year"].unique(),
             )
             # filter the df based on the selection of the user
@@ -196,7 +215,7 @@ if uploaded_file is not None:
             ]
             # selection box for letting the user filter the month
             monthly_report_choose_month1 = selector_month2.selectbox(
-                "Monthly Report - Month2",
+                "Monthly Report - Month - Right",
                 df_monthly_report_choose_year1["month"].unique(),
             )
 
@@ -280,6 +299,28 @@ if uploaded_file is not None:
                 monthly_report_choose_month1,
                 side=monthly_report_plot_right_side,
             )
+
+    with monthly_breakdown_tab4:
+        selector_year3, selector_month3 = st.columns(
+            (1, 1)
+        )
+        # define year and month to be selected
+        year_selection_waterfall = selector_year3.selectbox(
+            "Monthly Report - Year",
+            df_expenses["year"].unique(), key="waterfall_year"
+        )
+        # filter the df based on the selection of the user
+        df_monthly_report_choose_year_waterfall = df_expenses[
+            df_expenses["year"] == year_selection_waterfall
+        ]
+        # selection box for letting the user filter the month
+        monthly_waterfall = selector_month3.selectbox(
+            "Monthly Report - Month",
+            df_monthly_report_choose_year_waterfall["month"].unique(), key="waterfall_month"
+        )
+        
+        plot_waterfall_per_month(df_expenses, year_selection_waterfall, monthly_waterfall) # , annotation=annotation
+
 
     # --- CSS hacks --- #
     with open(r"C:\solutions\learning_python\expense_tracker\src\style\style.css") as f:
