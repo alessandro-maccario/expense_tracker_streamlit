@@ -4,14 +4,7 @@
 """
 
 # --- Import packages --- #
-import pandas as pd
 import streamlit as st
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import text
-from pkgs.sqlalchemy_db import (
-    TEST_Expense,
-    engine,
-)
 from pkgs.CRUD import (
     commit_to_database,
     read_from_database,
