@@ -2,7 +2,6 @@
 import datetime
 import pandas as pd
 import streamlit as st
-from pkgs.global_vars import today, past
 
 
 def total_expenses_timeframe(df: pd.DataFrame, year: str, month: str) -> None:
@@ -30,6 +29,11 @@ def total_expenses_timeframe(df: pd.DataFrame, year: str, month: str) -> None:
 
     # Filter data between two dates for the expense_category bar plot
     df_expenses_filtered = df.loc[(df["year"] == year) & (df["month"] == month)]
+    df_expenses_filtered = df_expenses_filtered.loc[
+        ~df_expenses_filtered["expense_category"].isin(
+            ["income", "investment", "savings"]
+        )
+    ]
 
     # calculate total amount spent in the current timeframe selected
     current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
@@ -95,9 +99,11 @@ def metric_total_amount_spent(
     # calculate total amount spent in the current timeframe selected
     # current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
     current_total_expenses = round(
-        df_expenses_filtered.loc[df_expenses_filtered["expense_category"] != "income"][
-            "value"
-        ].sum(),
+        df_expenses_filtered.loc[
+            ~df_expenses_filtered["expense_category"].isin(
+                ["income", "investment", "savings"]
+            )
+        ]["value"].sum(),
         2,
     )
 
@@ -112,9 +118,11 @@ def metric_total_amount_spent(
 
     # total_expenses_previous_30_days = round(df_previous_30_days["value"].sum(), 2)
     total_expenses_previous_30_days = round(
-        df_previous_30_days.loc[df_previous_30_days["expense_category"] != "income"][
-            "value"
-        ].sum(),
+        df_previous_30_days.loc[
+            ~df_previous_30_days["expense_category"].isin(
+                ["income", "investment", "savings"]
+            )
+        ]["value"].sum(),
         2,
     )
 
@@ -130,9 +138,10 @@ def metric_total_amount_spent(
         value=current_total_expenses,
         delta=diff_total_expenses,
         delta_color="inverse",
+        help="vs. previous 30 days"
     )
 
-    return metric_total_amount_spent
+    return metric1_total_amount_spent
 
 
 def metric_total_amount_spent_category(
@@ -171,6 +180,7 @@ def metric_total_amount_spent_category(
         .sum(),
         2,
     )[0]
+    print("total_expenses_category IS:", total_expenses_category)
 
     # from the past date (start date), go back another month
     previous_30_days = past_date - datetime.timedelta(days=30)
@@ -206,6 +216,7 @@ def metric_total_amount_spent_category(
         value=total_expenses_category,
         delta=diff_total_expenses_category,
         delta_color="inverse",
+        help="vs. previous 30 days"
     )
 
     return metric2_total_amount_spent_category
@@ -249,9 +260,11 @@ def metric_total_income(df: pd.DataFrame, today_date: str, past_date: str) -> No
     # calculate total amount spent in the current timeframe selected
     # current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
     current_total_expenses = round(
-        df_expenses_filtered.loc[df_expenses_filtered["expense_category"] != "income"][
-            "value"
-        ].sum(),
+        df_expenses_filtered.loc[
+            ~df_expenses_filtered["expense_category"].isin(
+                ["income", "investment", "savings"]
+            )
+        ]["value"].sum(),
         2,
     )
 
@@ -262,9 +275,53 @@ def metric_total_income(df: pd.DataFrame, today_date: str, past_date: str) -> No
     # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
     metric_total_income = st.metric(
         label="Available income",
-        value=current_total_income,
-        delta=diff_total_income,
+        value=diff_total_income,
+        # delta=current_total_income,
         # delta_color="inverse",
     )
 
     return metric_total_income
+
+
+# def metric_total_investment(df: pd.DataFrame) -> None:
+#     """
+#     --- Overall Overview function ---
+#     Function to calculate the metric corresponding to the total amount of investment for the entire dataset
+
+#     Parameters
+#     ----------
+#     df : pd.DataFrame
+#         Original dataframe
+#     today_date : str
+#         "To" date. Most recent date until which you want to filter.
+#     past_date : str
+#         "From" date. Past date from which you want to start filtering.
+
+#     Returns
+#     -------
+#     None
+#         Return the metrics computed for the metric to be displayed.
+#     """
+
+#     try:
+#         # if this information is available, compute the amount of savings available
+#         total_savings = df.loc[df["expense_category"] == "savings"]["value"].sum()
+#     except ValueError:
+#         total_savings = 0
+
+#     try:
+#         # if this information is available, compute the amount of investment available
+#         total_investment = df.loc[df["expense_category"] == "investment"]["value"].sum()
+#     except ValueError:
+#         total_investment = 0
+
+#     # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
+#     metric_total_income = st.metric(
+#         label="Available savings/investment",
+#         value=total_savings,
+#         delta=total_investment,
+#         # delta_color="inverse",
+#         help="Savings/Investments"
+#     )
+
+#     return metric_total_income
