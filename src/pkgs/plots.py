@@ -36,15 +36,11 @@ def monthly_report_plot(df: pd.DataFrame, year: str, month: str, side: str) -> N
     df_monthly_report_choose_year = df[df["year"] == year]
 
     # filter the df based on the selection of the user
-    df_monthly_report_choose_month = df_monthly_report_choose_year[
-        df_monthly_report_choose_year["month"] == month
-    ]
+    df_monthly_report_choose_month = df_monthly_report_choose_year[df_monthly_report_choose_year["month"] == month]
 
     # create the horizontal bar plot
     fig_bar_chart_monthly_report_plot = px.bar(
-        df_monthly_report_choose_month.groupby("expense_category")["value"]
-        .sum()
-        .reset_index(),
+        df_monthly_report_choose_month.groupby("expense_category")["value"].sum().reset_index(),
         y="expense_category",
         x="value",
         color="expense_category",
@@ -52,9 +48,7 @@ def monthly_report_plot(df: pd.DataFrame, year: str, month: str, side: str) -> N
     )
 
     # define the descending order of the barplots
-    fig_bar_chart_monthly_report_plot.update_layout(
-        barmode="stack", yaxis={"categoryorder": "total ascending"}
-    )
+    fig_bar_chart_monthly_report_plot.update_layout(barmode="stack", yaxis={"categoryorder": "total ascending"})
     # Update layout (optional)
     fig_bar_chart_monthly_report_plot.update_layout(
         title="Expenses per category",
@@ -71,23 +65,17 @@ def monthly_report_plot(df: pd.DataFrame, year: str, month: str, side: str) -> N
     return plot1
 
 
-def plot_bar_chart_category_total(
-    df: pd.DataFrame, today_date: str, past_date: str
-) -> None:
+def plot_bar_chart_category_total(df: pd.DataFrame, today_date: str, past_date: str) -> None:
     """
     Bar chart to show all the categories available in a specific
     timeframe and the total amount spent for each category
     """
 
     # Filter data between two dates, "From" and "To" date
-    df_expenses_within_date_range = df.loc[
-        (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
-    ]
+    df_expenses_within_date_range = df.loc[(df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)]
 
     df_expenses_within_date_range = df_expenses_within_date_range.loc[
-        ~df_expenses_within_date_range["expense_category"].isin(
-            ["income", "investment", "savings"]
-        )
+        ~df_expenses_within_date_range["expense_category"].isin(["income", "investment", "savings"])
     ]
 
     # # set the index using the expense_category column
@@ -101,16 +89,12 @@ def plot_bar_chart_category_total(
 
     # instantiate the bar chart with the expense categories
     fig_bar_chart = px.bar(
-        df_expenses_within_date_range.groupby("expense_category")["value"]
-        .sum()
-        .reset_index(),
+        df_expenses_within_date_range.groupby("expense_category")["value"].sum().reset_index(),
         x="expense_category",
         y="value",
         color="expense_category",
     )
-    fig_bar_chart.update_layout(
-        barmode="stack", xaxis={"categoryorder": "total descending"}
-    )
+    fig_bar_chart.update_layout(barmode="stack", xaxis={"categoryorder": "total descending"})
     # Update layout (optional)
     fig_bar_chart.update_layout(
         title="Expenses per category",
@@ -127,9 +111,7 @@ def plot_bar_chart_category_total(
     return plot1
 
 
-def plot_donut_chart_store_total(
-    df: pd.DataFrame, today_date: str, past_date: str
-) -> None:
+def plot_donut_chart_store_total(df: pd.DataFrame, today_date: str, past_date: str) -> None:
     """
         Plot a donut chart with the percentage of expenses for each
         store in the timeframe selected.
@@ -145,14 +127,10 @@ def plot_donut_chart_store_total(
     """
 
     # Filter data between two dates, "From" and "To" date
-    df_expenses_within_date_range = df.loc[
-        (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
-    ]
+    df_expenses_within_date_range = df.loc[(df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)]
 
     df_expenses_within_date_range = df_expenses_within_date_range.loc[
-        ~df_expenses_within_date_range["expense_category"].isin(
-            ["income", "investment", "savings"]
-        )
+        ~df_expenses_within_date_range["expense_category"].isin(["income", "investment", "savings"])
     ]
 
     # Donut chart
@@ -204,18 +182,14 @@ def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str, side: str) ->
     # filter the df out using the "choose_year" filter for the year
     df_expenses_subdf_by_month_per_year = df[df["year"] == year]
     # get only the month and the values
-    df_expenses_subdf_by_month = df_expenses_subdf_by_month_per_year[
-        ["months_text", "value"]
-    ]
+    df_expenses_subdf_by_month = df_expenses_subdf_by_month_per_year[["months_text", "value"]]
 
     # take the average daily expenses per month
     monthly_sum_values = df_expenses_subdf_by_month.groupby(["months_text"]).sum()
 
     # get statistics per months, using a bar plot
     fig_bar_chart_months = px.bar(
-        df_expenses_filtered_year.groupby(["expense_category", "months_text"])["value"]
-        .sum()
-        .reset_index(),
+        df_expenses_filtered_year.groupby(["expense_category", "months_text"])["value"].sum().reset_index(),
         x="months_text",
         y="value",
         color="expense_category",
@@ -236,9 +210,7 @@ def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str, side: str) ->
         )
     )
     # Update layout
-    fig_bar_chart_months.update_layout(
-        title="Expenses per Month", xaxis_title="Months", yaxis_title="Sum of Expenses"
-    )
+    fig_bar_chart_months.update_layout(title="Expenses per Month", xaxis_title="Months", yaxis_title="Sum of Expenses")
 
     # reorder the months for the barplot
     fig_bar_chart_months.update_xaxes(
@@ -270,10 +242,19 @@ def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str, side: str) ->
     return plot3
 
 
-def plot_waterfall_per_month(df, year, month, title="", annotation=None, 
-              icolor="#8fcf00", dcolor="#ff6b7f", 
-              tcolor="#4c5982", ccolor='Dark Grey', 
-              color=None, measure=None):
+def plot_waterfall_per_month(
+    df,
+    year,
+    month,
+    title="",
+    annotation=None,
+    icolor="#8fcf00",
+    dcolor="#ff6b7f",
+    tcolor="#4c5982",
+    ccolor="Dark Grey",
+    color=None,
+    measure=None,
+):
     """
     Original author:
         - Alan Jones
@@ -300,79 +281,106 @@ def plot_waterfall_per_month(df, year, month, title="", annotation=None,
     title = "Waterfall Breakdown Monthly Expenses"
 
     # plot the waterfall diagram with the remaining income per month
-    labels = ["Income", 
-          "Household & Personal Care", 
-          "Apparel", 
-          "Entertainment & Leisure", 
-          "Food",
-          "Restaurant", 
-          "Home & Living", 
-          "Transportation", 
-          "Education & Learning", 
-          "Others",
-          "Remaining Income"]
+    labels = [
+        "Income",
+        "Household & Personal Care",
+        "Apparel",
+        "Entertainment & Leisure",
+        "Food",
+        "Restaurant",
+        "Home & Living",
+        "Transportation",
+        "Education & Learning",
+        "Others",
+        "Remaining Income",
+    ]
 
     # filter the df based on the selection of the user
     df_monthly_report_choose_year = df[df["year"] == year]
 
     # filter the df based on the selection of the user
-    df_monthly_report_choose_month = df_monthly_report_choose_year[
-        df_monthly_report_choose_year["month"] == month
-    ]
+    df_monthly_report_choose_month = df_monthly_report_choose_year[df_monthly_report_choose_year["month"] == month]
 
     ###########################################
     ##### Bar selection for each category #####
     # filter in only the income for the first bar
     df_income = df_monthly_report_choose_month.loc[df["expense_category"].isin(["income"])]["value"].sum()
-    df_household_personalCare = df_monthly_report_choose_month.loc[df["expense_category"].isin(["household & personal care"])]["value"].sum()
+
+    # filter in only the household & personal care for the second bar
+    df_household_personalCare = df_monthly_report_choose_month.loc[df["expense_category"].isin(["household & personal care"])][
+        "value"
+    ].sum()
+
+    # filter in only the Apparel for the third bar
     df_apparel = df_monthly_report_choose_month.loc[df["expense_category"].isin(["Apparel"])]["value"].sum()
+
+    # filter in only the entertainment & leisure for the fourth bar
     df_entertainment_leisure = df_monthly_report_choose_month.loc[df["expense_category"].isin(["entertainment & leisure"])]["value"].sum()
+
+    # filter in only the food for the fifth bar
     df_food = df_monthly_report_choose_month.loc[df["expense_category"].isin(["food"])]["value"].sum()
+
+    # filter in only the restaurant for the sixth bar
     df_restaurant = df_monthly_report_choose_month.loc[df["expense_category"].isin(["restaurant"])]["value"].sum()
+
+    # filter in only the home & living for the seventh bar
     df_home_living = df_monthly_report_choose_month.loc[df["expense_category"].isin(["home & living"])]["value"].sum()
+
+    # filter in only the transportation for the eigth bar
     df_transportation = df_monthly_report_choose_month.loc[df["expense_category"].isin(["transportation"])]["value"].sum()
-    df_transportation = df_monthly_report_choose_month.loc[df["expense_category"].isin(["transportation"])]["value"].sum()
+
+    # filter in only the education & learning for the ninth bar
     df_education_learning = df_monthly_report_choose_month.loc[df["expense_category"].isin(["education & learning"])]["value"].sum()
+
+    # filter in only the others for the tenth bar
     df_others = df_monthly_report_choose_month.loc[df["expense_category"].isin(["others"])]["value"].sum()
 
     ###########################################
 
     # create the data based on the dataframe and the main categories
-    data = [df_income, 
-            -df_household_personalCare, 
-            -df_apparel, 
-            -df_entertainment_leisure, 
-            -df_food, 
-            -df_restaurant, 
-            -df_home_living, 
-            -df_transportation, 
-            -df_education_learning, 
-            -df_others, 
-            0 ] 
+    data = [
+        df_income,
+        -df_household_personalCare,
+        -df_apparel,
+        -df_entertainment_leisure,
+        -df_food,
+        -df_restaurant,
+        -df_home_living,
+        -df_transportation,
+        -df_education_learning,
+        -df_others,
+        0,
+    ]
 
     # Set default measure values if not provided
     if measure is None:
-        measure = ['relative'] * (len(labels) - 1)
-        measure.append('total')
+        # Docs: https://plotly.com/python/waterfall-charts/
+        # Explanation: all measures are relative, except the last one that is a total meausure
+        measure = ["relative"] * (len(labels) - 1)
+        # Append the last measurement as total
+        measure.append("total")
 
     # Set default annotation values if not provided
     if annotation is None:
+        # do not consider the total, and slice the list of values
         annotation = data[:-1]
         annotation.append(round(sum(data), 2))
 
     # Create the waterfall chart figure
-    fig = go.Figure(go.Waterfall(
-        orientation="v",
-        measure=measure,
-        textposition="outside",
-        text=annotation,
-        y=data,
-        x=labels,
-        connector={"line": {"color": ccolor}},
-        decreasing={"marker": {"color": dcolor}},
-        increasing={"marker": {"color": icolor}},
-        totals={"marker": {"color": tcolor}}
-    )).update_layout(
+    fig = go.Figure(
+        go.Waterfall(
+            orientation="v",
+            measure=measure,
+            textposition="outside",
+            text=annotation,
+            y=data,
+            x=labels,
+            connector={"line": {"color": ccolor}},
+            decreasing={"marker": {"color": dcolor}},
+            increasing={"marker": {"color": icolor}},
+            totals={"marker": {"color": tcolor}},
+        )
+    ).update_layout(
         title=title,
         height=510,
     )

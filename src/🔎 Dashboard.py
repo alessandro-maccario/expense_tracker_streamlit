@@ -1,7 +1,7 @@
 """
-    Expense tracker: get information about your monthly expenses, in detail.
-    This is the first step to start implementing your personal 
-    budget management strategy.
+Expense tracker: get information about your monthly expenses, in detail.
+This is the first step to start implementing your personal
+budget management strategy.
 """
 
 # use streamlit
@@ -9,18 +9,21 @@ import pandas as pd
 import streamlit as st
 from pkgs.global_vars import today, past
 from pkgs.metrics import (
-    total_expenses_timeframe, 
-    metric_total_expenses_timeframe, 
-    metric_total_amount_spent, 
-    metric_total_amount_spent_category, 
-    metric_total_income)
-    # metric_total_investment)
+    total_expenses_timeframe,
+    metric_total_expenses_timeframe,
+    metric_total_amount_spent,
+    metric_total_amount_spent_category,
+    metric_total_income,
+)
+
+# metric_total_investment)
 from pkgs.plots import (
-    monthly_report_plot, 
-    plot_bar_chart_category_total, 
-    plot_donut_chart_store_total, 
+    monthly_report_plot,
+    plot_bar_chart_category_total,
+    plot_donut_chart_store_total,
     plot_bar_chart_expenses_per_month,
-    plot_waterfall_per_month)
+    plot_waterfall_per_month,
+)
 
 
 # REQUIRED by Streamlit for downloading the data in the correct format:
@@ -36,14 +39,11 @@ st.set_page_config(layout="wide", page_title="Dashboard", page_icon="🔎")
 
 # sidebar
 with st.sidebar:
-
     # add sidebar title
     st.sidebar.title("Expense Tracker")
 
     # allow only .csv and .xlsx files to be uploaded
-    uploaded_file = st.file_uploader(
-        "Upload a file (.csv OR .xlsx)", type=["csv", "xlsx"]
-    )
+    uploaded_file = st.file_uploader("Upload a file (.csv OR .xlsx)", type=["csv", "xlsx"])
 
     # Check if file was uploaded
     if uploaded_file:
@@ -88,8 +88,15 @@ with st.sidebar:
 # otherwise show the hint to upload it.
 if uploaded_file is not None:
     # define three tabs where to insert the plots
-    overall_overview_tab1, monthly_trend_tab2, monthly_comparison_tab3, monthly_breakdown_tab4 = st.tabs(
-        ["📈 Overall Overview", "👓 Monthly Overview", "👨🏼‍🤝‍👨🏼 Monthly comparison", "🧾 Monthly Breakdown"]
+    overall_overview_tab1, monthly_trend_tab2, monthly_comparison_tab3, monthly_breakdown_tab4 = (
+        st.tabs(
+            [
+                "📈 Overall Overview",
+                "👓 Monthly Overview",
+                "👨🏼‍🤝‍👨🏼 Monthly comparison",
+                "🧾 Monthly Breakdown",
+            ]
+        )
     )
 
     # sort the data by date
@@ -115,9 +122,7 @@ if uploaded_file is not None:
             ]
             categories_with_data = (
                 round(
-                    df_expenses_filtered_categories.groupby(["expense_category"])[
-                        "value"
-                    ].sum(),
+                    df_expenses_filtered_categories.groupby(["expense_category"])["value"].sum(),
                     2,
                 )
             ).sort_values(ascending=False)
@@ -158,9 +163,7 @@ if uploaded_file is not None:
         # ###################################################
         # --- Plots --- #
         # Create columns to position the plots: create a container
-        bar_plot_expense_per_category, donut_chart_expenses_per_store = st.columns(
-            (1, 1)
-        )
+        bar_plot_expense_per_category, donut_chart_expenses_per_store = st.columns((1, 1))
 
         with bar_plot_expense_per_category:
             plot1 = plot_bar_chart_category_total(df_expenses, today_date, past_date)
@@ -176,9 +179,7 @@ if uploaded_file is not None:
         df_expenses["year"].unique(),
     )
 
-    plot3 = plot_bar_chart_expenses_per_month(
-        df_expenses, choose_year, side=monthly_trend_tab2
-    )
+    plot3 = plot_bar_chart_expenses_per_month(df_expenses, choose_year, side=monthly_trend_tab2)
 
     #####################################
     # --- Monthly report comparison --- #
@@ -186,9 +187,7 @@ if uploaded_file is not None:
 
     # Create columns to place the two plots
     with monthly_comparison_tab3:
-        selector_year1, selector_month1, selector_year2, selector_month2 = st.columns(
-            (1, 1, 1, 1)
-        )
+        selector_year1, selector_month1, selector_year2, selector_month2 = st.columns((1, 1, 1, 1))
 
         with selector_year1:
             year_selection = selector_year1.selectbox(
@@ -196,9 +195,7 @@ if uploaded_file is not None:
                 df_expenses["year"].unique(),
             )
             # filter the df based on the selection of the user
-            df_monthly_report_choose_year = df_expenses[
-                df_expenses["year"] == year_selection
-            ]
+            df_monthly_report_choose_year = df_expenses[df_expenses["year"] == year_selection]
             # selection box for letting the user filter the month
             monthly_report_choose_month = selector_month1.selectbox(
                 "Monthly Report - Month - Left",
@@ -210,9 +207,7 @@ if uploaded_file is not None:
                 df_expenses["year"].unique(),
             )
             # filter the df based on the selection of the user
-            df_monthly_report_choose_year1 = df_expenses[
-                df_expenses["year"] == year_selection2
-            ]
+            df_monthly_report_choose_year1 = df_expenses[df_expenses["year"] == year_selection2]
             # selection box for letting the user filter the month
             monthly_report_choose_month1 = selector_month2.selectbox(
                 "Monthly Report - Month - Right",
@@ -241,14 +236,12 @@ if uploaded_file is not None:
 
         # calculate difference between right side and left side
         difference_right2left = round(
-            total_expenses_timeframe_right_metric
-            - total_expenses_timeframe_left_metric,
+            total_expenses_timeframe_right_metric - total_expenses_timeframe_left_metric,
             2,
         )
         # calculate difference between left side and right side
         difference_left2right = round(
-            total_expenses_timeframe_left_metric
-            - total_expenses_timeframe_right_metric,
+            total_expenses_timeframe_left_metric - total_expenses_timeframe_right_metric,
             2,
         )
 
@@ -301,13 +294,10 @@ if uploaded_file is not None:
             )
 
     with monthly_breakdown_tab4:
-        selector_year3, selector_month3 = st.columns(
-            (1, 1)
-        )
+        selector_year3, selector_month3 = st.columns((1, 1))
         # define year and month to be selected
         year_selection_waterfall = selector_year3.selectbox(
-            "Monthly Report - Year",
-            df_expenses["year"].unique(), key="waterfall_year"
+            "Monthly Report - Year", df_expenses["year"].unique(), key="waterfall_year"
         )
         # filter the df based on the selection of the user
         df_monthly_report_choose_year_waterfall = df_expenses[
@@ -316,20 +306,20 @@ if uploaded_file is not None:
         # selection box for letting the user filter the month
         monthly_waterfall = selector_month3.selectbox(
             "Monthly Report - Month",
-            df_monthly_report_choose_year_waterfall["month"].unique(), key="waterfall_month"
+            df_monthly_report_choose_year_waterfall["month"].unique(),
+            key="waterfall_month",
         )
-        
-        plot_waterfall_per_month(df_expenses, year_selection_waterfall, monthly_waterfall) # , annotation=annotation
 
+        plot_waterfall_per_month(
+            df_expenses, year_selection_waterfall, monthly_waterfall
+        )  # , annotation=annotation
 
     # --- CSS hacks --- #
     with open(r"C:\solutions\learning_python\expense_tracker\src\style\style.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 else:
-    st.text(
-        "To start the dashboard, please, upload a file using the button on the sidebar."
-    )
+    st.text("To start the dashboard, please, upload a file using the button on the sidebar.")
 
 # TODO:
 # Continue with the README:
