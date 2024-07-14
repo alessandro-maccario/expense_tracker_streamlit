@@ -17,6 +17,7 @@ st-pages = "^0.4.5"
 sqlalchemy = "^2.0.30"
 python-dotenv = "^1.0.1"
 mysqlclient = "^2.2.4"
+ruff = "^0.5.1"
 
 
 [build-system]
