@@ -1,9 +1,6 @@
 # use streamlit
-import datetime
 import pandas as pd
 import streamlit as st
-from io import BytesIO
-from pkgs.global_vars import today, past
 import plotly.express as px
 import plotly.graph_objects as go
 
@@ -31,6 +28,10 @@ def monthly_report_plot(df: pd.DataFrame, year: str, month: str, side: str) -> N
     None
         Stacked bar chart will be returned.
     """
+
+    # filter out the income, it's not an expense
+    df = df.loc[~df["expense_category"].isin(["income", "investment", "savings"])]
+
     # filter the df based on the selection of the user
     df_monthly_report_choose_year = df[df["year"] == year]
 
@@ -58,7 +59,7 @@ def monthly_report_plot(df: pd.DataFrame, year: str, month: str, side: str) -> N
     fig_bar_chart_monthly_report_plot.update_layout(
         title="Expenses per category",
         xaxis_title="Total amount spent",
-        yaxis_title="Month",
+        yaxis_title="Categories",
     )
 
     # plot
@@ -83,14 +84,20 @@ def plot_bar_chart_category_total(
         (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
     ]
 
-    # set the index using the expense_category column
-    df_expenses_filtered_for_category = df_expenses_within_date_range.set_index(
-        "expense_category"
-    )
-    # group by expenses and sum the value for each category
-    df_expenses_filtered_year_grouped = df_expenses_within_date_range.groupby(
-        "expense_category",
-    )[["value"]].sum()
+    df_expenses_within_date_range = df_expenses_within_date_range.loc[
+        ~df_expenses_within_date_range["expense_category"].isin(
+            ["income", "investment", "savings"]
+        )
+    ]
+
+    # # set the index using the expense_category column
+    # df_expenses_filtered_for_category = df_expenses_within_date_range.set_index(
+    #     "expense_category"
+    # )
+    # # group by expenses and sum the value for each category
+    # df_expenses_filtered_year_grouped = df_expenses_within_date_range.groupby(
+    #     "expense_category",
+    # )[["value"]].sum()
 
     # instantiate the bar chart with the expense categories
     fig_bar_chart = px.bar(
@@ -142,6 +149,12 @@ def plot_donut_chart_store_total(
         (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
     ]
 
+    df_expenses_within_date_range = df_expenses_within_date_range.loc[
+        ~df_expenses_within_date_range["expense_category"].isin(
+            ["income", "investment", "savings"]
+        )
+    ]
+
     # Donut chart
     # instantiate the donut chart with the stores
     fig_pie_plot = px.pie(
@@ -182,6 +195,9 @@ def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str, side: str) ->
     None
         Return the plot to be displayed.
     """
+
+    # filter out the income from the plot, it's not an expense
+    df = df.loc[~df["expense_category"].isin(["income", "investment", "savings"])]
 
     #  Filter data for year
     df_expenses_filtered_year = df.loc[(df["year"] == int(year))]
@@ -252,3 +268,119 @@ def plot_bar_chart_expenses_per_month(df: pd.DataFrame, year: str, side: str) ->
     )
 
     return plot3
+
+
+def plot_waterfall_per_month(df, year, month, title="", annotation=None, 
+              icolor="#8fcf00", dcolor="#ff6b7f", 
+              tcolor="#4c5982", ccolor='Dark Grey', 
+              color=None, measure=None):
+    """
+    Original author:
+        - Alan Jones
+        - https://towardsdatascience.com/how-to-build-waterfall-charts-with-plotly-graph-objects-a8354543c42e
+
+    Create a waterfall chart using Plotly.
+
+    Parameters:
+        labels (list): A list of labels for the data points.
+        data (list): A list of numerical values representing the data points.
+        title (str, optional): The title of the chart. Defaults to an empty string.
+        annotation (list, optional): A list of annotations for each data point. Defaults to None.
+        icolor (str, optional): Color for increasing values. Defaults to "Green".
+        dcolor (str, optional): Color for decreasing values. Defaults to "Red".
+        tcolor (str, optional): Color for the total value. Defaults to "Blue".
+        ccolor (str, optional): Connector line color. Defaults to 'Dark Grey'.
+        color (str, optional): Common color for all elements. Defaults to None.
+        measure (list, optional): A list specifying whether each data point is 'relative' or 'total'. Defaults to None.
+
+    Returns:
+        plotly.graph_objs._figure.Figure: A Plotly Figure containing the waterfall chart.
+    """
+    # plot title
+    title = "Waterfall Breakdown Monthly Expenses"
+
+    # plot the waterfall diagram with the remaining income per month
+    labels = ["Income", 
+          "Household & Personal Care", 
+          "Apparel", 
+          "Entertainment & Leisure", 
+          "Food",
+          "Restaurant", 
+          "Home & Living", 
+          "Transportation", 
+          "Education & Learning", 
+          "Others",
+          "Remaining Income"]
+
+    # filter the df based on the selection of the user
+    df_monthly_report_choose_year = df[df["year"] == year]
+
+    # filter the df based on the selection of the user
+    df_monthly_report_choose_month = df_monthly_report_choose_year[
+        df_monthly_report_choose_year["month"] == month
+    ]
+
+    ###########################################
+    ##### Bar selection for each category #####
+    # filter in only the income for the first bar
+    df_income = df_monthly_report_choose_month.loc[df["expense_category"].isin(["income"])]["value"].sum()
+    df_household_personalCare = df_monthly_report_choose_month.loc[df["expense_category"].isin(["household & personal care"])]["value"].sum()
+    df_apparel = df_monthly_report_choose_month.loc[df["expense_category"].isin(["Apparel"])]["value"].sum()
+    df_entertainment_leisure = df_monthly_report_choose_month.loc[df["expense_category"].isin(["entertainment & leisure"])]["value"].sum()
+    df_food = df_monthly_report_choose_month.loc[df["expense_category"].isin(["food"])]["value"].sum()
+    df_restaurant = df_monthly_report_choose_month.loc[df["expense_category"].isin(["restaurant"])]["value"].sum()
+    df_home_living = df_monthly_report_choose_month.loc[df["expense_category"].isin(["home & living"])]["value"].sum()
+    df_transportation = df_monthly_report_choose_month.loc[df["expense_category"].isin(["transportation"])]["value"].sum()
+    df_transportation = df_monthly_report_choose_month.loc[df["expense_category"].isin(["transportation"])]["value"].sum()
+    df_education_learning = df_monthly_report_choose_month.loc[df["expense_category"].isin(["education & learning"])]["value"].sum()
+    df_others = df_monthly_report_choose_month.loc[df["expense_category"].isin(["others"])]["value"].sum()
+
+    ###########################################
+
+    # create the data based on the dataframe and the main categories
+    data = [df_income, 
+            -df_household_personalCare, 
+            -df_apparel, 
+            -df_entertainment_leisure, 
+            -df_food, 
+            -df_restaurant, 
+            -df_home_living, 
+            -df_transportation, 
+            -df_education_learning, 
+            -df_others, 
+            0 ] 
+
+    # Set default measure values if not provided
+    if measure is None:
+        measure = ['relative'] * (len(labels) - 1)
+        measure.append('total')
+
+    # Set default annotation values if not provided
+    if annotation is None:
+        annotation = data[:-1]
+        annotation.append(round(sum(data), 2))
+
+    # Create the waterfall chart figure
+    fig = go.Figure(go.Waterfall(
+        orientation="v",
+        measure=measure,
+        textposition="outside",
+        text=annotation,
+        y=data,
+        x=labels,
+        connector={"line": {"color": ccolor}},
+        decreasing={"marker": {"color": dcolor}},
+        increasing={"marker": {"color": icolor}},
+        totals={"marker": {"color": tcolor}}
+    )).update_layout(
+        title=title,
+        height=510,
+    )
+
+    # plot
+    plot4 = st.plotly_chart(
+        fig,
+        use_container_width=True,
+    )
+
+    return plot4
