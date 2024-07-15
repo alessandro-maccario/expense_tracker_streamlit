@@ -322,21 +322,7 @@ else:
     st.text("To start the dashboard, please, upload a file using the button on the sidebar.")
 
 # TODO:
-# Continue with the README:
-# https://github.com/alessandro-maccario/expense_tracker_streamlit/blob/main/README.md
-
-# TODO:
 # need to create classes in this branch
-
-# TODO:
-# need to beautify the design, look here:
-# https://webcache.googleusercontent.com/search?q=cache:https://medium.com/@ericdennis7/how-to-beautify-streamlit-using-stylable-containers-69c1634971a6&strip=0&vwsrc=1&referer=medium-parser
-# https://medium.com/@ericdennis7/5-components-that-beautify-your-streamlit-app-79039f405ae1
-
-# TODO:
-# need to add a buy me a coffee button, look here:
-# https://arnaudmiribel.github.io/streamlit-extras/extras/badges/
-# https://arnaudmiribel.github.io/streamlit-extras/extras/buy_me_a_coffee/
 
 # TODO:
 # need to refactor the Waterfall diagram and remove references
