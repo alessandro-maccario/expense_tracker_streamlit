@@ -1,5 +1,9 @@
 # Expense Tracker
 
+### Introduction
+
+# **ADD: LINK TO THE STREAMLIT WEBPAGE**
+
 ### What is an Expense Tracker? 📊
 
 An Expense Tracker is a tool designed to help users manage and monitor their expenses.
@@ -62,7 +66,7 @@ In this project I've used:
 
 - **Python** 🐍
 - **Streamlit**: A popular open-source framework for building data-driven web applications quickly and easily using Python.
-  The reason behind the usage of Streamlit relies on my wish to learn more about this Python package and how far you can achieve using it.
+  The reason behind the usage of Streamlit relies on my wish to learn more about this Python package and how far you can get by using it.
 
 ### Future Development
 
