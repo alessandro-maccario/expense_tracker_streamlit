@@ -66,23 +66,16 @@ In this project I've used:
 
 ### Future Development
 
-The current release lacks a lot of features that a full-fledge Expense Tracker could have.
-It is also a **completely free version** that you can use whenever you want, and that I built in my spare time, therefore it contains the basics capabilities but no more.
+Here's a refined version of your text:
 
-If you want to **contribute**, please do not hesitate to open a pull request and ask for features. If possible, I'll see to implement them.
+The current release lacks many features that a full-fledged Expense Tracker could have. It is also a **completely free version** that you can use whenever you want. It has been built during free time, therefore it contains the basic capabilities to be functional.
+
+### Feedbacks
+
+Feedbacks can come in many forms:
+
+- if you want to **contribute**, please do not hesitate to open a pull request
+- if you enjoyed using this **Expense Tracker**, leave a star on the Github page
+- if you feel very generous, click on the _buy me a coffee_ button to show your support 😉. As a coffee lover, any _Espresso_ that I can get, it's always appreciated 😄☕☕☕
 
 ---
-
-**To be improved and finished!**
-
-Did you enjoy using this **Expense Tracker**? Leave a Star on the Github page: it would be helpful for me to understand if this app has some traction and more time could be spent on this side-project.
-
-If you want to _buy me a coffee_ to show your support, you can use the corresponding button in the sidebar. I'm originally from Italy, therefore any _Espresso_ that I can get, it's always appreciated 😉☕☕☕
-
----
-
-KEEP READING THIS:
-
-- https://www.freecodecamp.org/news/how-to-write-a-good-readme-file/
-
-TO ANSWER HERE:
