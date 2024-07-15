@@ -29,7 +29,9 @@ def total_expenses_timeframe(df: pd.DataFrame, year: str, month: str) -> None:
 
     # Filter data between two dates for the expense_category bar plot
     df_expenses_filtered = df.loc[(df["year"] == year) & (df["month"] == month)]
-    df_expenses_filtered = df_expenses_filtered.loc[~df_expenses_filtered["expense_category"].isin(["income", "investment", "savings"])]
+    df_expenses_filtered = df_expenses_filtered.loc[
+        ~df_expenses_filtered["expense_category"].isin(["income", "investment", "savings"])
+    ]
 
     # calculate total amount spent in the current timeframe selected
     current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
@@ -84,12 +86,16 @@ def metric_total_amount_spent(df: pd.DataFrame, today_date: str, past_date: str)
     """
 
     # Filter data between two dates for the expense_category bar plot
-    df_expenses_filtered = df.loc[(df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)]
+    df_expenses_filtered = df.loc[
+        (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
+    ]
 
     # calculate total amount spent in the current timeframe selected
     # current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
     current_total_expenses = round(
-        df_expenses_filtered.loc[~df_expenses_filtered["expense_category"].isin(["income", "investment", "savings"])]["value"].sum(),
+        df_expenses_filtered.loc[
+            ~df_expenses_filtered["expense_category"].isin(["income", "investment", "savings"])
+        ]["value"].sum(),
         2,
     )
 
@@ -98,11 +104,15 @@ def metric_total_amount_spent(df: pd.DataFrame, today_date: str, past_date: str)
 
     # Filter data between the past date and 30 days earlier.
     # Useful to get the DELTA underneath the amount spent during the current timeframe
-    df_previous_30_days = df.loc[(df["date"].dt.date >= previous_30_days) & (df["date"].dt.date < past_date)]
+    df_previous_30_days = df.loc[
+        (df["date"].dt.date >= previous_30_days) & (df["date"].dt.date < past_date)
+    ]
 
     # total_expenses_previous_30_days = round(df_previous_30_days["value"].sum(), 2)
     total_expenses_previous_30_days = round(
-        df_previous_30_days.loc[~df_previous_30_days["expense_category"].isin(["income", "investment", "savings"])]["value"].sum(),
+        df_previous_30_days.loc[
+            ~df_previous_30_days["expense_category"].isin(["income", "investment", "savings"])
+        ]["value"].sum(),
         2,
     )
 
@@ -122,7 +132,9 @@ def metric_total_amount_spent(df: pd.DataFrame, today_date: str, past_date: str)
     return metric1_total_amount_spent
 
 
-def metric_total_amount_spent_category(df: pd.DataFrame, category: str, today_date: str, past_date: str) -> None:
+def metric_total_amount_spent_category(
+    df: pd.DataFrame, category: str, today_date: str, past_date: str
+) -> None:
     """
     --- Overall Overview function ---
     Function to calculate all the category metric in the Overall Overview.
@@ -145,28 +157,35 @@ def metric_total_amount_spent_category(df: pd.DataFrame, category: str, today_da
     """
 
     # Filter data between two dates for the expense_category bar plot
-    df_expenses_filtered = df.loc[(df["date"].dt.date >= past_date) & (df["date"].dt.date <= today_date)]
+    df_expenses_filtered = df.loc[
+        (df["date"].dt.date >= past_date) & (df["date"].dt.date <= today_date)
+    ]
 
     # calculate total amount ONLY for the category selected (for the selected timeframe)
     total_expenses_category = round(
-        df_expenses_filtered[df_expenses_filtered["expense_category"] == category].groupby(["expense_category"])["value"].sum(),
+        df_expenses_filtered[df_expenses_filtered["expense_category"] == category]
+        .groupby(["expense_category"])["value"]
+        .sum(),
         2,
     )[0]
-    print("total_expenses_category IS:", total_expenses_category)
 
     # from the past date (start date), go back another month
     previous_30_days = past_date - datetime.timedelta(days=30)
 
     # Filter data between the past date and 30 days earlier.
     # Useful to get the DELTA underneath the amount spent during the current timeframe
-    df_previous_30_days = df.loc[(df["date"].dt.date >= previous_30_days) & (df["date"].dt.date <= past_date)]
+    df_previous_30_days = df.loc[
+        (df["date"].dt.date >= previous_30_days) & (df["date"].dt.date <= past_date)
+    ]
 
     # calculate total amount ONLY for food (for the 30 days before the "From" date)
     # try-except: if no expenses for the selected category has been found for the selected timeframe
     # then show 0 as value for both the total_expenses_category and total_expenses_previous_30_days_category
     try:
         total_expenses_previous_30_days_category = round(
-            df_previous_30_days[df_previous_30_days["expense_category"] == category].groupby(["expense_category"])["value"].sum(),
+            df_previous_30_days[df_previous_30_days["expense_category"] == category]
+            .groupby(["expense_category"])["value"]
+            .sum(),
             2,
         )[0]
     except IndexError:
@@ -174,7 +193,9 @@ def metric_total_amount_spent_category(df: pd.DataFrame, category: str, today_da
 
     # take the difference between the current timeframe and the previous 30 days, then show the value
     # as a metric ONLY for the chosen category
-    diff_total_expenses_category = round(total_expenses_category - total_expenses_previous_30_days_category, 2)
+    diff_total_expenses_category = round(
+        total_expenses_category - total_expenses_previous_30_days_category, 2
+    )
 
     # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
     metric2_total_amount_spent_category = st.metric(
@@ -210,19 +231,25 @@ def metric_total_income(df: pd.DataFrame, today_date: str, past_date: str) -> No
     """
 
     # Filter data between two dates for the expense_category bar plot
-    df_expenses_filtered = df.loc[(df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)]
+    df_expenses_filtered = df.loc[
+        (df["date"].dt.date >= past_date) & (df["date"].dt.date < today_date)
+    ]
 
     # select only the rows that contains "salary" and sum up the values
     # current_total_income = df_expenses_filtered.loc[
     #     df_expenses_filtered["expense_category"] == "income", "value"
     # ].sum()
-    current_total_income = df_expenses_filtered.loc[df_expenses_filtered["expense_category"] == "income"]["value"].sum()
+    current_total_income = df_expenses_filtered.loc[
+        df_expenses_filtered["expense_category"] == "income"
+    ]["value"].sum()
     # print(df_expenses_filtered.loc[df_expenses_filtered["expense_category"] == "food"])
 
     # calculate total amount spent in the current timeframe selected
     # current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
     current_total_expenses = round(
-        df_expenses_filtered.loc[~df_expenses_filtered["expense_category"].isin(["income", "investment", "savings"])]["value"].sum(),
+        df_expenses_filtered.loc[
+            ~df_expenses_filtered["expense_category"].isin(["income", "investment", "savings"])
+        ]["value"].sum(),
         2,
     )
 
