@@ -112,9 +112,6 @@ class ExpenseMetric:
         current_total_expenses = round(df_expenses_filtered["value"].sum(), 2)
         return current_total_expenses
 
-    # TODO:
-    # CONTINUE FROM HERE
-    # The class gives an odd results. Check again with the same filters directly into the Excel
     def compute_metrics_by_category(self, category: str) -> None:
         # filter the dataframe
         df_expenses_filtered = self.filter_data(self.past_date, self.today_date)
@@ -148,8 +145,6 @@ class ExpenseMetric:
 
         return
 
-    # TODO
-    # TO CONTINUE FROM HERE
     def metric_total_expenses_timeframe_class(
         self, total_amount_spent: callable, delta: float, side: str
     ) -> None:
@@ -159,3 +154,8 @@ class ExpenseMetric:
             label="Total amount spent",
             delta_color="inverse",
         )
+
+
+# TODO
+# need to add all the comments from the metrics.py file to here
+# need to convert the plot functions to classes
