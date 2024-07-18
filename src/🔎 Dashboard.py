@@ -8,13 +8,13 @@ budget management strategy.
 import pandas as pd
 import streamlit as st
 from pkgs.global_vars import today, past
-from pkgs.metrics import (
-    total_expenses_timeframe,
-    metric_total_expenses_timeframe,
-    metric_total_amount_spent,
-    metric_total_amount_spent_category,
-    metric_total_income,
-)
+# from pkgs.metrics import (
+#     # total_expenses_timeframe,
+#     # metric_total_expenses_timeframe,
+#     # metric_total_amount_spent,
+#     # metric_total_amount_spent_category,
+#     # metric_total_income,
+# )
 
 from pkgs.metrics_dataclasses import ExpenseMetric
 
@@ -249,17 +249,33 @@ if uploaded_file is not None:
             monthly_report_metric_right_side,
         ) = st.columns((0.8, 0.6, 0.8))
 
-        # calculate total amount spent for the right side metric
-        total_expenses_timeframe_right_metric = total_expenses_timeframe(
+        # instantiate the class
+        total_expenses_timeframe_right_metric = ExpenseMetric(
             df_expenses,
-            year_selection,
-            monthly_report_choose_month,
+            today_date,
+            past_date,
+        )
+        total_expenses_timeframe_left_metric = ExpenseMetric(
+            df_expenses,
+            today_date,
+            past_date,
+        )
+
+        # calculate total amount spent for the right side metric
+        total_expenses_timeframe_right_metric = (
+            total_expenses_timeframe_right_metric.total_expenses_timeframe(
+                df_expenses,
+                year_selection,
+                monthly_report_choose_month,
+            )
         )
         # calculate total amount spent for the left side metric
-        total_expenses_timeframe_left_metric = total_expenses_timeframe(
-            df_expenses,
-            year_selection2,
-            monthly_report_choose_month1,
+        total_expenses_timeframe_left_metric = (
+            total_expenses_timeframe_left_metric.total_expenses_timeframe(
+                df_expenses,
+                year_selection2,
+                monthly_report_choose_month1,
+            )
         )
 
         # calculate difference between right side and left side
@@ -280,9 +296,9 @@ if uploaded_file is not None:
                 today_date,
                 past_date,
             )
-            metric_total_expenses_timeframe(
+            metric_total_expenses_class_left_metric.metric_total_expenses_timeframe_class(
                 metric_total_expenses_class_left_metric.total_expenses_timeframe(
-                    # df_expenses,
+                    df_expenses,
                     year_selection,
                     monthly_report_choose_month,
                 ),
@@ -296,9 +312,9 @@ if uploaded_file is not None:
                 today_date,
                 past_date,
             )
-            metric_total_expenses_timeframe(
+            metric_total_expenses_class_right_metric.metric_total_expenses_timeframe_class(
                 metric_total_expenses_class_right_metric.total_expenses_timeframe(
-                    # df_expenses,
+                    df_expenses,
                     year_selection2,
                     monthly_report_choose_month1,
                 ),
