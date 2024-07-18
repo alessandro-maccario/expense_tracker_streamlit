@@ -5,9 +5,6 @@ import streamlit as st
 
 
 def total_expenses_timeframe(df: pd.DataFrame, year: str, month: str) -> None:
-    ######################################
-    # --- ALREADY CONVERTED TO CLASS --- #
-    ######################################
     """
     Function to calculate the total amount spent in a specific timeframe.
 
@@ -73,10 +70,6 @@ def metric_total_expenses_timeframe(total_amount_spent: callable, delta: float, 
 
 
 def metric_total_amount_spent(df: pd.DataFrame, today_date: str, past_date: str) -> None:
-    ######################################
-    # --- ALREADY CONVERTED TO CLASS --- #
-    ######################################
-
     """
     --- Overall Overview function ---
     Function to calculate the metric corresponding to the total amount spent in a specific timeframe.
@@ -144,7 +137,10 @@ def metric_total_amount_spent(df: pd.DataFrame, today_date: str, past_date: str)
 
 
 def metric_total_amount_spent_category(
-    df: pd.DataFrame, category: str, today_date: str, past_date: str
+    df: pd.DataFrame,
+    category: str,
+    today_date: str,
+    past_date: str,
 ) -> None:
     """
     --- Overall Overview function ---
@@ -220,11 +216,7 @@ def metric_total_amount_spent_category(
     return metric2_total_amount_spent_category
 
 
-# monthly salary and available income after expenses
 def metric_total_income(df: pd.DataFrame, today_date: str, past_date: str) -> None:
-    ######################################
-    # --- ALREADY CONVERTED TO CLASS --- #
-    ######################################
     """
     --- Overall Overview function ---
     Function to calculate the metric corresponding to the total amount of income available in a specific timeframe.
@@ -282,45 +274,45 @@ def metric_total_income(df: pd.DataFrame, today_date: str, past_date: str) -> No
     return metric_total_income
 
 
-# def metric_total_investment(df: pd.DataFrame) -> None:
-#     """
-#     --- Overall Overview function ---
-#     Function to calculate the metric corresponding to the total amount of investment for the entire dataset
+def metric_total_investment(df: pd.DataFrame) -> None:
+    """
+    --- Overall Overview function ---
+    Function to calculate the metric corresponding to the total amount of investment for the entire dataset
 
-#     Parameters
-#     ----------
-#     df : pd.DataFrame
-#         Original dataframe
-#     today_date : str
-#         "To" date. Most recent date until which you want to filter.
-#     past_date : str
-#         "From" date. Past date from which you want to start filtering.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Original dataframe
+    today_date : str
+        "To" date. Most recent date until which you want to filter.
+    past_date : str
+        "From" date. Past date from which you want to start filtering.
 
-#     Returns
-#     -------
-#     None
-#         Return the metrics computed for the metric to be displayed.
-#     """
+    Returns
+    -------
+    None
+        Return the metrics computed for the metric to be displayed.
+    """
 
-#     try:
-#         # if this information is available, compute the amount of savings available
-#         total_savings = df.loc[df["expense_category"] == "savings"]["value"].sum()
-#     except ValueError:
-#         total_savings = 0
+    try:
+        # if this information is available, compute the amount of savings available
+        total_savings = df.loc[df["expense_category"] == "savings"]["value"].sum()
+    except ValueError:
+        total_savings = 0
 
-#     try:
-#         # if this information is available, compute the amount of investment available
-#         total_investment = df.loc[df["expense_category"] == "investment"]["value"].sum()
-#     except ValueError:
-#         total_investment = 0
+    try:
+        # if this information is available, compute the amount of investment available
+        total_investment = df.loc[df["expense_category"] == "investment"]["value"].sum()
+    except ValueError:
+        total_investment = 0
 
-#     # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
-#     metric_total_income = st.metric(
-#         label="Available savings/investment",
-#         value=total_savings,
-#         delta=total_investment,
-#         # delta_color="inverse",
-#         help="Savings/Investments"
-#     )
+    # --- Metric that shows the total amount spent in the previous 30 days from past_date --- #
+    metric_total_income = st.metric(
+        label="Available savings/investment",
+        value=total_savings,
+        delta=total_investment,
+        # delta_color="inverse",
+        help="Savings/Investments",
+    )
 
-#     return metric_total_income
+    return metric_total_income
