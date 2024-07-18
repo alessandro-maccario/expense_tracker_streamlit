@@ -16,6 +16,8 @@ from pkgs.metrics import (
     metric_total_income,
 )
 
+from pkgs.metrics_dataclasses import ExpenseMetric
+
 # metric_total_investment)
 from pkgs.plots import (
     monthly_report_plot,
@@ -148,15 +150,41 @@ if uploaded_file is not None:
         ) = st.columns(3)
 
         with metric1_total_amount_spent:
-            metric1_total_amount_spent = metric_total_amount_spent(
-                df_expenses, today_date, past_date
+            # instantiate the class
+            metric1_total_amount_spent = ExpenseMetric(
+                df_expenses,
+                today_date,
+                past_date,
+                delta_color="inverse",
+                help_text="vs. previous 30 days",
             )
+            metric1_total_amount_spent.compute_metrics()
+            # metric1_total_amount_spent = metric_total_amount_spent(
+            #     df_expenses, today_date, past_date
+            # )
         with metric2_total_amount_spent_category:
-            metric2_total_amount_spent_category = metric_total_amount_spent_category(
-                df_expenses, category_selection, today_date, past_date
+            # instantiate the class
+            metric2_total_amount_spent_category = ExpenseMetric(
+                df_expenses,
+                today_date,
+                past_date,
+                # label="Available income",
             )
+            metric2_total_amount_spent_category.compute_metrics_by_category(category_selection)
+
+            # metric2_total_amount_spent_category = metric_total_amount_spent_category(
+            #     df_expenses, category_selection, today_date, past_date
+            # )
         with metric3_income:
-            metric3_income = metric_total_income(df_expenses, today_date, past_date)
+            # instantiate the class
+            metric3_income = ExpenseMetric(
+                df_expenses,
+                today_date,
+                past_date,
+                # label="Available income",
+            )
+            metric3_income.compute_total_income()
+            # metric3_income = metric_total_income(df_expenses, today_date, past_date)
 
         # with metric4_investment:
         #     metric4_investment = metric_total_investment(df_expenses)
@@ -245,22 +273,32 @@ if uploaded_file is not None:
             2,
         )
 
-        # set the metric on the left side
+        # set the metric on the left side in the Monthly Comparison tab
         with monthly_report_metric_left_side:
+            metric_total_expenses_class_left_metric = ExpenseMetric(
+                df_expenses,
+                today_date,
+                past_date,
+            )
             metric_total_expenses_timeframe(
-                total_expenses_timeframe(
-                    df_expenses,
+                metric_total_expenses_class_left_metric.total_expenses_timeframe(
+                    # df_expenses,
                     year_selection,
                     monthly_report_choose_month,
                 ),
                 delta=difference_right2left,
                 side=monthly_report_metric_left_side,
             )
-        # set the metric on the right side
+        # set the metric on the right side in the Monthly Comparison tab
         with monthly_report_metric_right_side:
+            metric_total_expenses_class_right_metric = ExpenseMetric(
+                df_expenses,
+                today_date,
+                past_date,
+            )
             metric_total_expenses_timeframe(
-                total_expenses_timeframe(
-                    df_expenses,
+                metric_total_expenses_class_right_metric.total_expenses_timeframe(
+                    # df_expenses,
                     year_selection2,
                     monthly_report_choose_month1,
                 ),
