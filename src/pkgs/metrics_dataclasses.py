@@ -102,8 +102,8 @@ class ExpenseMetric:
             diff_total=None,
         )
 
-    def total_expenses_timeframe(self, year: str, month: str) -> float:
-        df_expenses_filtered = self.df.loc[(self.df["year"] == year) & (self.df["month"] == month)]
+    def total_expenses_timeframe(self, df, year: str, month: str) -> float:
+        df_expenses_filtered = df.loc[(df["year"] == year) & (df["month"] == month)]
         df_expenses_filtered = df_expenses_filtered.loc[
             ~df_expenses_filtered["expense_category"].isin(["income", "investment", "savings"])
         ]
@@ -147,3 +147,15 @@ class ExpenseMetric:
         )
 
         return
+
+    # TODO
+    # TO CONTINUE FROM HERE
+    def metric_total_expenses_timeframe_class(
+        self, total_amount_spent: callable, delta: float, side: str
+    ) -> None:
+        return side.metric(
+            value=total_amount_spent,
+            delta=delta,
+            label="Total amount spent",
+            delta_color="inverse",
+        )
