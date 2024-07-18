@@ -1,10 +1,13 @@
-# use streamlit
+# --- Import packages --- #
 import datetime
 import pandas as pd
 import streamlit as st
 
 
 def total_expenses_timeframe(df: pd.DataFrame, year: str, month: str) -> None:
+    ######################################
+    # --- ALREADY CONVERTED TO CLASS --- #
+    ######################################
     """
     Function to calculate the total amount spent in a specific timeframe.
 
@@ -39,7 +42,7 @@ def total_expenses_timeframe(df: pd.DataFrame, year: str, month: str) -> None:
     return current_total_expenses
 
 
-def metric_total_expenses_timeframe(total_amount_spent, delta: float, side: str) -> None:
+def metric_total_expenses_timeframe(total_amount_spent: callable, delta: float, side: str) -> None:
     """
     Function to display the metric based on the total amount spent in a specific timeframe.
 
@@ -47,6 +50,10 @@ def metric_total_expenses_timeframe(total_amount_spent, delta: float, side: str)
     ----------
     total_amount_spent : Callable
         Call the function "total_expenses_timeframe" to calculate the amount spent in a specific timeframe
+    delta : float
+        Delta value corresponding to the difference with the adjacent metric.
+    side : DeltaGenerator
+        The place where the metric should be inserted (for instance, left, center, right)
 
     Returns
     -------
@@ -66,6 +73,10 @@ def metric_total_expenses_timeframe(total_amount_spent, delta: float, side: str)
 
 
 def metric_total_amount_spent(df: pd.DataFrame, today_date: str, past_date: str) -> None:
+    ######################################
+    # --- ALREADY CONVERTED TO CLASS --- #
+    ######################################
+
     """
     --- Overall Overview function ---
     Function to calculate the metric corresponding to the total amount spent in a specific timeframe.
@@ -211,6 +222,9 @@ def metric_total_amount_spent_category(
 
 # monthly salary and available income after expenses
 def metric_total_income(df: pd.DataFrame, today_date: str, past_date: str) -> None:
+    ######################################
+    # --- ALREADY CONVERTED TO CLASS --- #
+    ######################################
     """
     --- Overall Overview function ---
     Function to calculate the metric corresponding to the total amount of income available in a specific timeframe.

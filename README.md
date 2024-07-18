@@ -29,6 +29,17 @@ This tool can immediately answer the following questions:
 - Comparing two months, in which month did you spend less/more, and on what?
 - Based on your monthly income, how much money is left after all the expenses?
 
+### How to use it?
+
+## TO BE ADDED:
+
+- which filetype?
+- which columns should be used?
+- how the columns look like?
+- what is the data type of each element in the columns?
+- show an example
+- tell the user that they are able to download a sample data from the first page. That file has to be edited with the new information!
+
 ### Discover the application 📚
 
 You start the application by simply load the file that contains your data. In the sidebar, you can click on the _Download a sample_ to get an idea of what the file should look like. The only boundary condition, is that the data can be found in the main sheet (for instance, using _Excel_ just one sheet with all the data).
