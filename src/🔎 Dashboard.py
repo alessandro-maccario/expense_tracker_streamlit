@@ -17,15 +17,16 @@ from pkgs.global_vars import today, past
 # )
 
 from pkgs.metrics_dataclasses import ExpenseMetric
+from pkgs.plots_dataclasses import ExpensePlot, ExpensePlotMonth
 
-# metric_total_investment)
-from pkgs.plots import (
-    monthly_report_plot,
-    plot_bar_chart_category_total,
-    plot_donut_chart_store_total,
-    plot_bar_chart_expenses_per_month,
-    plot_waterfall_per_month,
-)
+# metric_total_investment
+# from pkgs.plots import (
+#     # monthly_report_plot,
+#     # plot_bar_chart_category_total,
+#     # plot_donut_chart_store_total,
+#     # plot_bar_chart_expenses_per_month,
+#     # plot_waterfall_per_month,
+# )
 
 
 # REQUIRED by Streamlit for downloading the data in the correct format:
@@ -192,11 +193,21 @@ if uploaded_file is not None:
         # --- Plots --- #
         # Create columns to position the plots: create a container
         bar_plot_expense_per_category, donut_chart_expenses_per_store = st.columns((1, 1))
+        # instantiate the class
+        plot_bar_chart_category = ExpensePlot(
+            df_expenses,
+            today_date,
+            past_date,
+        )
 
         with bar_plot_expense_per_category:
-            plot1 = plot_bar_chart_category_total(df_expenses, today_date, past_date)
+            plot1 = plot_bar_chart_category.plot_bar_chart_category_total(
+                df_expenses, today_date, past_date
+            )
         with donut_chart_expenses_per_store:
-            plot2 = plot_donut_chart_store_total(df_expenses, today_date, past_date)
+            plot2 = plot_bar_chart_category.plot_donut_chart_store_total(
+                df_expenses, today_date, past_date
+            )
 
     # ########################################################
     # --- Bar plot per year and months --- #
@@ -207,7 +218,12 @@ if uploaded_file is not None:
         df_expenses["year"].unique(),
     )
 
-    plot3 = plot_bar_chart_expenses_per_month(df_expenses, choose_year, side=monthly_trend_tab2)
+    # instantiate the class
+    plot_bar_chart_year_month = ExpensePlotMonth(df_expenses, choose_year, side=monthly_trend_tab2)
+
+    plot3 = plot_bar_chart_year_month.plot_bar_chart_expenses_per_month(
+        df_expenses, choose_year, side=monthly_trend_tab2
+    )
 
     #####################################
     # --- Monthly report comparison --- #
@@ -328,23 +344,28 @@ if uploaded_file is not None:
             monthly_report_plot_right_side,
         ) = st.columns(2)
 
+        # instantiate the class
+        plot_bar_chart_category = ExpensePlotMonth(
+            df_expenses, year_selection, monthly_report_choose_month, monthly_report_plot_left_side
+        )
+
         with monthly_report_plot_left_side:
             # set up the plots
             # display the plot the stacked bar chart - plot 1
-            monthly_report_plot(
+            plot_bar_chart_category.monthly_report_plot(
                 df_expenses,
                 year_selection,
                 monthly_report_choose_month,
-                side=monthly_report_plot_left_side,
+                monthly_report_plot_left_side,
             )
 
         with monthly_report_plot_right_side:
             # display the plot the stacked bar chart - plot 2
-            monthly_report_plot(
+            plot_bar_chart_category.monthly_report_plot(
                 df_expenses,
                 year_selection2,
                 monthly_report_choose_month1,
-                side=monthly_report_plot_right_side,
+                monthly_report_plot_right_side,
             )
 
     with monthly_breakdown_tab4:
@@ -364,7 +385,10 @@ if uploaded_file is not None:
             key="waterfall_month",
         )
 
-        plot_waterfall_per_month(
+        # instantiate the class
+        plot_waterfall = ExpensePlotMonth(df_expenses, year_selection_waterfall, monthly_waterfall)
+
+        plot_waterfall.plot_waterfall_per_month(
             df_expenses, year_selection_waterfall, monthly_waterfall
         )  # , annotation=annotation
 
