@@ -21,9 +21,9 @@ class ExpenseMetric:
     help_text: str = "vs. previous 30 days"  # optional paramater
     label_text: str = "Expenses in the timeframe"
 
-    def filter_data(self, start_date: str, end_date: str) -> pd.DataFrame:
+    def filter_data(self, df: pd.DataFrame, past_date: str, today_date: str) -> pd.DataFrame:
         return self.df.loc[
-            (self.df["date"].dt.date >= start_date) & (self.df["date"].dt.date <= end_date)
+            (self.df["date"].dt.date >= past_date) & (self.df["date"].dt.date <= today_date)
         ]
 
     def calculate_total_expenses(self, df_filtered: pd.DataFrame) -> float:
@@ -63,13 +63,13 @@ class ExpenseMetric:
 
     def compute_metrics(self):
         # Filter the data based on the current timeframe selection
-        df_current_filtered = self.filter_data(self.past_date, self.today_date)
+        df_current_filtered = self.filter_data(self.df, self.past_date, self.today_date)
         current_total_expenses = self.calculate_total_expenses(df_current_filtered)
 
         # calculate previous 30 days data
         # from the past date (start date), go back another month
         previous_30_days = self.past_date - datetime.timedelta(days=30)
-        df_previous_filtered = self.filter_data(previous_30_days, self.past_date)
+        df_previous_filtered = self.filter_data(self.df, previous_30_days, self.past_date)
         total_expenses_previous_30_days = self.calculate_total_expenses(df_previous_filtered)
 
         # calculate the difference
@@ -86,7 +86,7 @@ class ExpenseMetric:
 
     def compute_total_income(self):
         # Filter the data based on the current timeframe selection
-        df_current_filtered = self.filter_data(self.past_date, self.today_date)
+        df_current_filtered = self.filter_data(self.df, self.past_date, self.today_date)
         current_total_income = self.calculate_total_income(df_current_filtered)
 
         # compute totale expenses
@@ -114,14 +114,14 @@ class ExpenseMetric:
 
     def compute_metrics_by_category(self, category: str) -> None:
         # filter the dataframe
-        df_expenses_filtered = self.filter_data(self.past_date, self.today_date)
+        df_expenses_filtered = self.filter_data(self.df, self.past_date, self.today_date)
         # calculate total amount ONLY for the category selected (for the selected timeframe)
         total_expenses_category = self.calculate_total_expenses_per_category(
             df_expenses_filtered, category
         )
 
         previous_30_days = self.past_date - datetime.timedelta(days=30)
-        df_previous_filtered = self.filter_data(previous_30_days, self.past_date)
+        df_previous_filtered = self.filter_data(self.df, previous_30_days, self.past_date)
 
         try:
             total_expenses_previous_30_days_category = self.calculate_total_expenses_per_category(
