@@ -103,6 +103,27 @@ class ExpenseMetric:
         )
 
     def total_expenses_timeframe(self, df, year: str, month: str) -> float:
+        """
+        Function to calculate the total amount spent in a specific timeframe.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Original dataframe
+        year : str
+            The user selects a year with which the dataframe is filtered.
+        past_date : str
+            The user selects a month with which the dataframe is filtered.
+        str : str
+            In which container the metric will be placed.
+
+        Returns
+        -------
+        current_total_expenses: float
+            Actual total value of the expenses for the month selected
+        None
+            Return the metrics computed for the metric to be displayed.
+        """
         df_expenses_filtered = df.loc[(df["year"] == year) & (df["month"] == month)]
         df_expenses_filtered = df_expenses_filtered.loc[
             ~df_expenses_filtered["expense_category"].isin(["income", "investment", "savings"])
@@ -113,6 +134,26 @@ class ExpenseMetric:
         return current_total_expenses
 
     def compute_metrics_by_category(self, category: str) -> None:
+        """
+        --- Overall Overview function ---
+        Function to calculate all the category metric in the Overall Overview.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Original dataframe
+        category : str
+            Category to filter the df with
+        today_date : str
+            "To" date. Most recent date until which you want to filter.
+        past_date : str
+            "From" date. Past date from which you want to start filtering.
+
+        Returns
+        -------
+        None
+            Return the metrics computed for each element.
+        """
         # filter the dataframe
         df_expenses_filtered = self.filter_data(self.df, self.past_date, self.today_date)
         # calculate total amount ONLY for the category selected (for the selected timeframe)
@@ -148,6 +189,23 @@ class ExpenseMetric:
     def metric_total_expenses_timeframe_class(
         self, total_amount_spent: callable, delta: float, side: str
     ) -> None:
+        """
+        Function to display the metric based on the total amount spent in a specific timeframe.
+
+        Parameters
+        ----------
+        total_amount_spent : Callable
+            Call the function "total_expenses_timeframe" to calculate the amount spent in a specific timeframe
+        delta : float
+            Delta value corresponding to the difference with the adjacent metric.
+        side : DeltaGenerator
+            The place where the metric should be inserted (for instance, left, center, right)
+
+        Returns
+        -------
+        None
+            Return the metrics computed for the metric to be displayed.
+        """
         return side.metric(
             value=total_amount_spent,
             delta=delta,
@@ -158,4 +216,4 @@ class ExpenseMetric:
 
 # TODO
 # need to add all the comments from the metrics.py file to here
-# need to convert the plot functions to classes
+# Refactor this code and the plots_dataclasses.py code
