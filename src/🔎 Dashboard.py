@@ -8,25 +8,8 @@ budget management strategy.
 import pandas as pd
 import streamlit as st
 from pkgs.global_vars import today, past
-# from pkgs.metrics import (
-#     # total_expenses_timeframe,
-#     # metric_total_expenses_timeframe,
-#     # metric_total_amount_spent,
-#     # metric_total_amount_spent_category,
-#     # metric_total_income,
-# )
-
 from pkgs.metrics_dataclasses import ExpenseMetric
 from pkgs.plots_dataclasses import ExpensePlot, ExpensePlotMonth
-
-# metric_total_investment
-# from pkgs.plots import (
-#     # monthly_report_plot,
-#     # plot_bar_chart_category_total,
-#     # plot_donut_chart_store_total,
-#     # plot_bar_chart_expenses_per_month,
-#     # plot_waterfall_per_month,
-# )
 
 
 # REQUIRED by Streamlit for downloading the data in the correct format:
