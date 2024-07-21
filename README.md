@@ -39,6 +39,7 @@ This tool can immediately answer the following questions:
 - what is the data type of each element in the columns?
 - show an example
 - tell the user that they are able to download a sample data from the first page. That file has to be edited with the new information!
+- what about the **income**, **savings**, **investment** categories? For the income, it really should be called **income**, otherwise it will not be considered for the waterfall diagram and the metric!
 
 ### Discover the application 📚
 
