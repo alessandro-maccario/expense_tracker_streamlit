@@ -64,12 +64,15 @@ class TestMetric(unittest.TestCase):
         # The filter_data method is properly executed on an instance of ExpenseMetric,
         # which includes the df attribute, resolving the AttributeError.
         result_df = ExpenseMetric(df=df, past_date=past_date, today_date=today_date)
-        result_df = result_df.filter_data(df, past_date, today_date).reset_index(drop=True)
+        result_df = result_df.filter_data(df, past_date, today_date)
 
         # 3.ASSERT
         expected_df = pd.DataFrame(
             {"date": pd.date_range(start="2024-02-01", end="2024-03-01", freq="D")}
         ).reset_index(drop=True)
-        print(expected_df)
 
         return pd.testing.assert_frame_equal(result_df, expected_df)
+
+
+# To run the test from the CLI:
+# python -m unittest tests.test_metrics
