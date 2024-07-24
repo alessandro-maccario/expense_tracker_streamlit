@@ -58,7 +58,7 @@ class ExpenseMetric:
         """
         return self.df.loc[
             (self.df["date"].dt.date >= past_date) & (self.df["date"].dt.date <= today_date)
-        ]
+        ].reset_index(drop=True)
 
     def calculate_total_expenses(self, df_filtered: pd.DataFrame) -> float:
         """
