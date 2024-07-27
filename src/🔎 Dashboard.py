@@ -5,6 +5,8 @@ budget management strategy.
 """
 
 # use streamlit
+import time
+import numpy as np
 import pandas as pd
 import streamlit as st
 from pkgs.global_vars import today, past
@@ -32,12 +34,21 @@ with st.sidebar:
     uploaded_file = st.file_uploader("Upload a file (.csv OR .xlsx)", type=["csv", "xlsx"])
 
     # Check if file was uploaded
-    if uploaded_file:
-        if uploaded_file.type == "text/csv":
+    if uploaded_file is not None:
+        # get only the extension, either csv or txt or xlsx
+        file_extension = uploaded_file.name.split(".")[-1].lower()
+        if file_extension == "csv":
             # load the expenses file
             df_expenses = pd.read_csv(
                 uploaded_file,
-                converters={"date": pd.to_datetime},
+                dtype={
+                    "value": np.float64
+                },  # convert value to float, otherwise the delta does not accept integer
+                sep=";",
+                parse_dates=[
+                    "date"
+                ],  # this parse the date column. There is no datetime dtype to be set for read_csv as csv files can only contain strings, integers and floats.
+                dayfirst=True,  # read the date as dd/mm/yyyy, and not as mm/dd/yyyy
             )
         else:
             # load the expenses file
@@ -47,9 +58,7 @@ with st.sidebar:
             )
 
     # adding a download button to download sample of the data in a csv file
-    data_example_df = pd.read_csv(
-        r"C:\solutions\learning_python\expense_tracker\data\data_example.csv", sep=";"
-    )
+    data_example_df = pd.read_csv(r"../data/data_example.csv", sep=";")
     # convert the dataframe to be sent to the donwload button
     data_example_encoded = convert_df(data_example_df)
 
@@ -85,6 +94,15 @@ if uploaded_file is not None:
         )
     )
 
+    # if dataframe is completely empty (no data at all), then show a warning to the user
+    if df_expenses.index.empty == True:
+        st.warning(
+            "Empty dataframe! Please, provide a dataframe with data inside it as shown in the _Download sample data as CSV_ button!",
+            icon="⚠️",
+        )
+        with st.spinner("Hungry for data, please upload a file that contains information..."):
+            time.sleep(500)
+
     # sort the data by date
     df_expenses.sort_values(by=["date"], inplace=True)
 
@@ -117,7 +135,6 @@ if uploaded_file is not None:
             categories_with_data = categories_with_data[
                 ~categories_with_data.index.isin(["income", "investment", "savings"])
             ]
-
             # let the user select the category
             category_selection = select_category_dropdown.selectbox(
                 "Select the category:", categories_with_data.index.unique()
@@ -129,7 +146,6 @@ if uploaded_file is not None:
             metric1_total_amount_spent,
             metric2_total_amount_spent_category,
             metric3_income,
-            # metric4_investment,
         ) = st.columns(3)
 
         with metric1_total_amount_spent:
@@ -142,9 +158,6 @@ if uploaded_file is not None:
                 help_text="vs. previous 30 days",
             )
             metric1_total_amount_spent.compute_metrics()
-            # metric1_total_amount_spent = metric_total_amount_spent(
-            #     df_expenses, today_date, past_date
-            # )
         with metric2_total_amount_spent_category:
             # instantiate the class
             metric2_total_amount_spent_category = ExpenseMetric(
@@ -155,9 +168,6 @@ if uploaded_file is not None:
             )
             metric2_total_amount_spent_category.compute_metrics_by_category(category_selection)
 
-            # metric2_total_amount_spent_category = metric_total_amount_spent_category(
-            #     df_expenses, category_selection, today_date, past_date
-            # )
         with metric3_income:
             # instantiate the class
             metric3_income = ExpenseMetric(
@@ -167,10 +177,7 @@ if uploaded_file is not None:
                 # label="Available income",
             )
             metric3_income.compute_total_income()
-            # metric3_income = metric_total_income(df_expenses, today_date, past_date)
 
-        # with metric4_investment:
-        #     metric4_investment = metric_total_investment(df_expenses)
         # ###################################################
         # --- Plots --- #
         # Create columns to position the plots: create a container
@@ -382,10 +389,4 @@ else:
     st.text("To start the dashboard, please, upload a file using the button on the sidebar.")
 
 # TODO:
-# need to create classes in this branch
-
-# TODO:
 # need to refactor the Waterfall diagram and remove references
-
-# TODO:
-# need to unittest
