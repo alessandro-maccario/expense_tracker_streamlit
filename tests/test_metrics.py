@@ -84,7 +84,8 @@ class TestMetric(unittest.TestCase):
         using the arrange/act/assert testing methodology.
 
         """
-
+        # define the expense_category as a custom provider
+        # (a custom way of creating custom fake elements based on a built-in faker class)
         expense_category_types = DynamicProvider(
             provider_name="expense_category",
             elements=["income", "investment", "savings", "food", "gas", "entertainment"],
@@ -105,18 +106,166 @@ class TestMetric(unittest.TestCase):
         for idx in range(0, 10):
             fake_value_list.append(fake.pyint())
 
+        # 1.ARRANGE
         # create a fake pandas dataframe based on the fake_dict
         fake_dict = {"expense_category": fake_expense_category_list, "value": fake_value_list}
         fake_df = pd.DataFrame(fake_dict)
 
+        # 2.ACT
         # Apply the function to test it
         result_df = ExpenseMetric(df=fake_df)
-        result_value = result_df.calculate_total_expenses(result_df)
+        result_value = result_df.calculate_total_expenses(
+            result_df.df
+        )  # the .df is to get the df in the ExpenseMetric class object
 
         # 3.ASSERT: the expected result is the dataframe stripped of the "income", "investment", "savings"
         expected_value = fake_df[
             ~fake_df["expense_category"].isin(["income", "investment", "savings"])
         ]["value"].sum()
+        return self.assertTrue(result_value == expected_value)
+
+    def test_calculate_total_expenses_per_category(self):
+        """
+        Assert if the calculate_total_expenses_per_category() methods yield the expected results
+        based on a dataframe that contains only the category chosen
+        using the arrange/act/assert testing methodology.
+
+        """
+        # define the expense_category as a custom provider
+        # (a custom way of creating custom fake elements based on a built-in faker class)
+        expense_category_types = DynamicProvider(
+            provider_name="expense_category",
+            elements=["food", "gas", "entertainment"],
+        )
+
+        # instantiate Faker and use a seed to have fixed elements
+        fake = Faker()
+        Faker.seed(0)
+        # then add new provider to faker instance
+        fake.add_provider(expense_category_types)
+        fake_expense_category_list = list()
+        fake_value_list = list()
+
+        # now you can use:
+        for idx in range(0, 5):
+            fake_expense_category_list.append(fake.expense_category())
+
+        for idx in range(0, 5):
+            fake_value_list.append(fake.pyint())
+
+        # 1.ARRANGE
+        # create a fake pandas dataframe based on the fake_dict
+        fake_dict = {"expense_category": fake_expense_category_list, "value": fake_value_list}
+        fake_df = pd.DataFrame(fake_dict)
+
+        category = "entertainment"
+        # 2.ACT
+        # Apply the function to test it
+        result_df = ExpenseMetric(df=fake_df)
+        result_df = result_df.calculate_total_expenses_per_category(result_df.df, category)
+
+        # 3.ASSERT: the expected result is the dataframe stripped of the "income", "investment", "savings"
+        expected_value = (
+            fake_df[fake_df["expense_category"] == category]
+            .groupby(["expense_category"])["value"]
+            .sum(),
+            2,
+        )[0][0]
+        return self.assertTrue(result_df == expected_value)
+
+    def test_calculate_total_income(self):
+        """
+        Assert if the calculate_total_income() methods yield the expected results
+        based on a dataframe that contains only the "income"
+        using the arrange/act/assert testing methodology.
+
+        """
+        # define the expense_category as a custom provider
+        # (a custom way of creating custom fake elements based on a built-in faker class)
+        expense_category_types = DynamicProvider(
+            provider_name="expense_category",
+            elements=["food", "gas", "entertainment", "income", "income"],
+        )
+
+        # instantiate Faker and use a seed to have fixed elements
+        fake = Faker()
+        Faker.seed(0)
+        # then add new provider to faker instance
+        fake.add_provider(expense_category_types)
+        fake_expense_category_list = list()
+        fake_value_list = list()
+
+        # now you can use:
+        for idx in range(0, 5):
+            fake_expense_category_list.append(fake.expense_category())
+
+        for idx in range(0, 5):
+            fake_value_list.append(fake.pyint())
+
+        # 1.ARRANGE
+        # create a fake pandas dataframe based on the fake_dict
+        fake_dict = {"expense_category": fake_expense_category_list, "value": fake_value_list}
+        fake_df = pd.DataFrame(fake_dict)
+
+        # 2.ACT
+        # Apply the function to test it
+        result_df = ExpenseMetric(df=fake_df)
+        result_df = result_df.calculate_total_income(result_df.df)
+
+        # 3.ASSERT: the expected result is the dataframe stripped of the "income", "investment", "savings"
+        expected_value = (
+            fake_df.loc[fake_df["expense_category"] == "income"]["value"].sum(),
+            2,
+        )[0]
+        return self.assertTrue(result_df == expected_value)
+
+    def test_total_expenses_timeframe(self):
+        # 1.ARRANGE
+        # Sample DataFrame for testing and convert it to df
+        df = pd.DataFrame(
+            {"date": pd.date_range(start="2024-01-01", freq="D", periods=90)}
+        ).reset_index(drop=True)
+        df["year"] = df["date"].dt.year
+        df["month"] = df["date"].dt.month
+
+        expense_category_types = DynamicProvider(
+            provider_name="expense_category",
+            elements=["food", "gas", "entertainment", "income", "savings", "investments"],
+        )
+
+        # instantiate Faker and use a seed to have fixed elements
+        fake = Faker()
+        Faker.seed(0)
+        # then add new provider to faker instance
+        fake.add_provider(expense_category_types)
+        fake_expense_category_list = list()
+        fake_value_list = list()
+
+        # now you can use:
+        for idx in range(0, 90):
+            fake_expense_category_list.append(fake.expense_category())
+
+        for idx in range(0, 90):
+            fake_value_list.append(fake.pyint())
+
+        # create a fake pandas dataframe based on the fake_dict
+        fake_dict = {"expense_category": fake_expense_category_list, "value": fake_value_list}
+        fake_df = pd.DataFrame(fake_dict)
+        df_concat = pd.concat([df, fake_df], axis=1)
+
+        # 2.ACT
+        year = datetime.strptime("2024", "%Y").year
+        month = datetime.strptime("03", "%m").month
+
+        result_df = ExpenseMetric(df=df_concat)
+        result_value = result_df.total_expenses_timeframe(df=result_df.df, year=year, month=month)
+
+        # 3.ASSERT: the expected result is the dataframe stripped of the "income", "investment", "savings"
+        expected_df = df_concat.loc[(df_concat["year"] == year) & (df_concat["month"] == month)]
+        expected_value = expected_df[
+            ~expected_df["expense_category"].isin(["income", "investment", "savings"])
+        ]["value"].sum()
+
         return self.assertTrue(result_value == expected_value)
 
 
