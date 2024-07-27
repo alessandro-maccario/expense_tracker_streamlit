@@ -31,7 +31,7 @@ This tool can immediately answer the following questions:
 
 ### How to use it?
 
-The current application supports a _.csv_, _.xls_, _.xlsx_ filetype (**to be tested!**).
+The current application supports a _.csv_, _.xlsx_ filetype (**to be tested!**).
 The structure of the file should contain the following columns:
 
 - date
@@ -71,6 +71,21 @@ The datatype of each column is given below:
 
 The values for the `income`, `savings` and `investment` are special elements that must be called in this fashion for the Expense Tracker to be able to recognize them and display the metrics in the Web Application.
 **TODO: are we using the savings/investments for the current version? If not, delete them from here and check the application!**
+
+#### Category suggestions
+
+In the column `expense_category`, you are free to choose the category names as you like (except for the `income`, `savings` and `investment`, as already pointed out).
+Here, there are our suggestions (but feel free to create your own):
+
+- apparel (for anything related to clothes)
+- education & learning (for anything related to learning materials such as books, courses, online courses and so on)
+- entertainment & leisure (anything related to leisure time, such as going to the movie theather, going to the bowling alley, going to the restaurant and so on)
+- food (food related, such as grocery shopping)
+- home & living (such as the rent, the electricity bill and so on)
+- household & personal care (such as detergents for the washing machine, shampoo, toothpaste and so on)
+- restaurant (anything related to a breakfast/lunch/dinner or anything else at a restaurant place, such as getting an espresso, it can considered a _restaurant_ expense as well)
+- income (the amount of income, per month)
+- others (for anything else that does not fit into the previous categories)
 
 ## TO BE ADDED:
 
