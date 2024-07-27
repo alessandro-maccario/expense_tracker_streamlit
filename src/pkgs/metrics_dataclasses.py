@@ -97,10 +97,13 @@ class ExpenseMetric:
         float
             The total expenses for the specified category, rounded to two decimal places.
         """
-        return round(
-            df[df["expense_category"] == category].groupby(["expense_category"])["value"].sum(),
-            2,
-        )[0]
+        try:
+            return round(
+                df[df["expense_category"] == category].groupby(["expense_category"])["value"].sum(),
+                2,
+            )[0]
+        except IndexError:
+            pass
 
     def calculate_total_income(self, df: pd.DataFrame) -> float:
         """
@@ -116,7 +119,10 @@ class ExpenseMetric:
         float
             The total income calculated from the DataFrame.
         """
-        return df.loc[df["expense_category"] == "income"]["value"].sum()
+        try:
+            return df.loc[df["expense_category"] == "income"]["value"].sum()
+        except TypeError:
+            pass
 
     def calculate_diff_expenses(self, current_total: float, previous_total: float) -> float:
         """
@@ -134,7 +140,10 @@ class ExpenseMetric:
         float
             The difference between the current and previous total expenses, rounded to two decimal places.
         """
-        return round(current_total - previous_total, 2)
+        try:
+            return round(current_total - previous_total, 2)
+        except TypeError:
+            pass
 
     def display_metric(self, label: str, current_total: float, diff_total: float) -> None:
         """
