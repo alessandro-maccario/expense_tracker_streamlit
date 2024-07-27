@@ -31,14 +31,50 @@ This tool can immediately answer the following questions:
 
 ### How to use it?
 
+The current application supports a _.csv_, _.xls_, _.xlsx_ filetype (**to be tested!**).
+The structure of the file should contain the following columns:
+
+- date
+- expense_category
+- expense_type
+- value
+- month
+- year
+- weekday_number
+- weekday_text
+- months_text
+- store
+- city
+
+The columns `month`, `year`, `weekday_number`, `weekday_text`, `months_text` are automatically available by using the sampled data, because the formula needed for those columns are already in place in the Excel itself.
+
+A standard Excel file looks like the following table: (excluding the date columns)
+| date | expense_category | expense_type | value | store | city |
+| ---------- | ---------------- | ------------ | ------- | ----------- | -------- |
+| 01/06/2024 | restaurant | hamburger | 1,70 | McDonald's | New York |
+
+In addition, after firing up the application a `Download sample data as CSV` button is available that helps you understand the needed structure for the application. You can also use it as a template to insert your own data.
+**TODO: edit the sample data in order to have all the available columns**.
+
+The datatype of each column is given below:
+| date | date |
+|------------------|--------|
+| expense_category | string |
+| expense_type | string |
+| value | number |
+| store | string |
+| city | string |
+
+**To test which columns are not mandatory**
+
+#### Special values for the **expense_category** column
+
+The values for the `income`, `savings` and `investment` are special elements that must be called in this fashion for the Expense Tracker to be able to recognize them and display the metrics in the Web Application.
+**TODO: are we using the savings/investments for the current version? If not, delete them from here and check the application!**
+
 ## TO BE ADDED:
 
-- which filetype?
-- which columns should be used?
-- how the columns look like?
-- what is the data type of each element in the columns?
 - show an example
-- tell the user that they are able to download a sample data from the first page. That file has to be edited with the new information!
 - what about the **income**, **savings**, **investment** categories? For the income, it really should be called **income**, otherwise it will not be considered for the waterfall diagram and the metric!
 
 ### Discover the application 📚
