@@ -122,7 +122,6 @@ if uploaded_file is not None:
             category_selection = select_category_dropdown.selectbox(
                 "Select the category:", categories_with_data.index.unique()
             )
-            print("CATEGORY WITH DATA IS:", categories_with_data)
 
         # --- Metrics --- #
         # --- Create columns to position the metrics --- #
