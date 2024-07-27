@@ -4,6 +4,10 @@ Script to test the metrics_dataclasses.py class and methods.
 
 import unittest
 import pandas as pd
+from faker import Faker  # to create dummy/fake data
+
+# if no standard provider from Faker is sufficient, you create your own
+from faker.providers import DynamicProvider
 from datetime import datetime
 from src.pkgs.metrics_dataclasses import ExpenseMetric
 
@@ -72,6 +76,48 @@ class TestMetric(unittest.TestCase):
         ).reset_index(drop=True)
 
         return pd.testing.assert_frame_equal(result_df, expected_df)
+
+    def test_calculate_total_expenses(self):
+        """
+        Assert if the calculate_total_expenses() methods yield the expected results
+        based on a dataframe that does not contain "income", "investments", "savings"
+        using the arrange/act/assert testing methodology.
+
+        """
+
+        expense_category_types = DynamicProvider(
+            provider_name="expense_category",
+            elements=["income", "investment", "savings", "food", "gas", "entertainment"],
+        )
+
+        # instantiate Faker and use a seed to have fixed elements
+        fake = Faker()
+        Faker.seed(0)
+        # then add new provider to faker instance
+        fake.add_provider(expense_category_types)
+        fake_expense_category_list = list()
+        fake_value_list = list()
+
+        # now you can use:
+        for idx in range(0, 10):
+            fake_expense_category_list.append(fake.expense_category())
+
+        for idx in range(0, 10):
+            fake_value_list.append(fake.pyint())
+
+        # create a fake pandas dataframe based on the fake_dict
+        fake_dict = {"expense_category": fake_expense_category_list, "value": fake_value_list}
+        fake_df = pd.DataFrame(fake_dict)
+
+        # Apply the function to test it
+        result_df = ExpenseMetric(df=fake_df)
+        result_value = result_df.calculate_total_expenses(result_df)
+
+        # 3.ASSERT: the expected result is the dataframe stripped of the "income", "investment", "savings"
+        expected_value = fake_df[
+            ~fake_df["expense_category"].isin(["income", "investment", "savings"])
+        ]["value"].sum()
+        return self.assertTrue(result_value == expected_value)
 
 
 # To run the test from the CLI:
