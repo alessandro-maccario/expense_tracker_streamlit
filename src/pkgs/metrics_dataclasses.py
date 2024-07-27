@@ -31,8 +31,8 @@ class ExpenseMetric:
     """
 
     df: pd.DataFrame
-    today_date: str
-    past_date: str
+    today_date: Optional[str] = None
+    past_date: Optional[str] = None
     delta: Optional[float] = field(default=None)  # optional paramater
     delta_color: str = "inverse"  # optional paramater
     help_text: str = "vs. previous 30 days"  # optional paramater
@@ -60,7 +60,7 @@ class ExpenseMetric:
             (self.df["date"].dt.date >= past_date) & (self.df["date"].dt.date <= today_date)
         ].reset_index(drop=True)
 
-    def calculate_total_expenses(self, df_filtered: pd.DataFrame) -> float:
+    def calculate_total_expenses(self, df: pd.DataFrame) -> float:
         """
         Calculates the total expenses from the filtered DataFrame, excluding specified categories.
 
@@ -75,15 +75,13 @@ class ExpenseMetric:
             The total expenses rounded to two decimal places, excluding 'income', 'investment', and 'savings' categories.
         """
         return round(
-            df_filtered.loc[
-                ~df_filtered["expense_category"].isin(["income", "investment", "savings"])
-            ]["value"].sum(),
+            df.loc[~df["expense_category"].isin(["income", "investment", "savings"])][
+                "value"
+            ].sum(),
             2,
         )
 
-    def calculate_total_expenses_per_category(
-        self, df_filtered: pd.DataFrame, category: str
-    ) -> float:
+    def calculate_total_expenses_per_category(self, df: pd.DataFrame, category: str) -> float:
         """
         Calculates the total expenses for a specific category from the filtered DataFrame.
 
@@ -100,13 +98,11 @@ class ExpenseMetric:
             The total expenses for the specified category, rounded to two decimal places.
         """
         return round(
-            df_filtered[df_filtered["expense_category"] == category]
-            .groupby(["expense_category"])["value"]
-            .sum(),
+            df[df["expense_category"] == category].groupby(["expense_category"])["value"].sum(),
             2,
         )[0]
 
-    def calculate_total_income(self, df_filtered: pd.DataFrame) -> float:
+    def calculate_total_income(self, df: pd.DataFrame) -> float:
         """
         Calculates the total income from the filtered DataFrame.
 
@@ -120,7 +116,7 @@ class ExpenseMetric:
         float
             The total income calculated from the DataFrame.
         """
-        return df_filtered.loc[df_filtered["expense_category"] == "income"]["value"].sum()
+        return df.loc[df["expense_category"] == "income"]["value"].sum()
 
     def calculate_diff_expenses(self, current_total: float, previous_total: float) -> float:
         """
@@ -240,7 +236,7 @@ class ExpenseMetric:
             diff_total=None,
         )
 
-    def total_expenses_timeframe(self, df, year: str, month: str) -> float:
+    def total_expenses_timeframe(self, df: pd.DataFrame, year: str, month: str) -> float:
         """
         Function to calculate the total amount spent in a specific timeframe.
 
