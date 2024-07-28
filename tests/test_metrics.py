@@ -220,6 +220,11 @@ class TestMetric(unittest.TestCase):
         return self.assertTrue(result_df == expected_value)
 
     def test_total_expenses_timeframe(self):
+        """
+        Assert if the total_expenses_timeframe() methods yield the expected results
+        based on a dataframe filtered by the year and month using the arrange/act/assert testing methodology.
+
+        """
         # 1.ARRANGE
         # Sample DataFrame for testing and convert it to df
         df = pd.DataFrame(
