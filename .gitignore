@@ -1,3 +1,9 @@
 *.pyc
 .env
 attachments
+sql
+pages - temp
+CRUD.py
+ocr.py
+sqlalchemy_db.py
+sandbox.py
