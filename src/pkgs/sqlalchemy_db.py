@@ -1,9 +1,9 @@
 """
-    This script will connect to MySQL db using SQLAlchemy and using ORM 
-    (object relational mapping) creating the MySQL objects based on Python classes.
+This script will connect to MySQL db using SQLAlchemy and using ORM
+(object relational mapping) creating the MySQL objects based on Python classes.
 
-    Reference:
-        - https://www.youtube.com/watch?v=Z2zD3EdjpNo&list=PLKm_OLZcymWhtiM-0oQE2ABrrbgsndsn0
+Reference:
+    - https://www.youtube.com/watch?v=Z2zD3EdjpNo&list=PLKm_OLZcymWhtiM-0oQE2ABrrbgsndsn0
 """
 
 # --- Import packages --- #
@@ -34,9 +34,7 @@ db_port = os.getenv("db_port")
 # create the sql engine: needed to connect to the DB
 # https://www.geeksforgeeks.org/connecting-to-sql-database-using-sqlalchemy-in-python/
 # https://docs.sqlalchemy.org/en/20/core/engines.html#postgresql
-engine = create_engine(
-    f"mysql://{db_user}:{db_password}@{db_host}:{db_port}/db_expense_tracker"
-)
+engine = create_engine(f"mysql://{db_user}:{db_password}@{db_host}:{db_port}/db_expense_tracker")
 
 # Creating a Base Class: this base class is like a template for your table definitions.
 Base = declarative_base()

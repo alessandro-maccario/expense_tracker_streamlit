@@ -1,6 +1,6 @@
 """
-    This script built in Streamlit gives the user the possibility
-    to insert the data manually into the database.
+This script built in Streamlit gives the user the possibility
+to insert the data manually into the database.
 """
 
 # --- Import packages --- #
@@ -23,12 +23,9 @@ st.set_page_config(layout="wide", page_title="Data Management", page_icon="ðŸ›¢ï
 
 # # sidebar
 with st.sidebar:
-
     #     # add sidebar title
     st.sidebar.title("Expense Tracker")
-    st.markdown(
-        "Manage your data: create, read, update and delete rows from the database!"
-    )
+    st.markdown("Manage your data: create, read, update and delete rows from the database!")
 
 
 # CRUD operations
@@ -54,15 +51,11 @@ with create_read_data_db:
             right_space,
         ) = st.columns((1, 2, 2, 2, 1, 2, 2, 1))
         # create the save button
-        left_space1, left_space2, left_space3, save_the_data_button = st.columns(
-            (1, 1, 1, 1)
-        )
+        left_space1, left_space2, left_space3, save_the_data_button = st.columns((1, 1, 1, 1))
 
     # with notation
     with input_date:
-        input_date_value = input_date.date_input(
-            "Date of the purchase", "today", key="purchase_date"
-        )
+        input_date_value = input_date.date_input("Date of the purchase", "today", key="purchase_date")
     with expense_type:
         input_item_name = expense_type.text_input("Name of the item")
     with expense_price:
@@ -95,9 +88,7 @@ with create_read_data_db:
         city = st.text_input("City", max_chars=20, key="city_purchase")
 
     # Every form must have a submit button.
-    submitted = save_the_data_button.form_submit_button(
-        "Submit", help="Submit to database."
-    )
+    submitted = save_the_data_button.form_submit_button("Submit", help="Submit to database.")
 
     if submitted:
         # Automatically create other information useful for the database
@@ -169,11 +160,7 @@ with update_read_data_db:
         st.markdown("##### Edit the dataframe")
 
         # read from the database
-        db_dataframe = (
-            read_from_database()
-            .sort_values(by=["created_at"], ascending=False)
-            .reset_index(drop=True)
-        )
+        db_dataframe = read_from_database().sort_values(by=["created_at"], ascending=False).reset_index(drop=True)
         edited_df = st.data_editor(
             db_dataframe,
             disabled=["index", "created_at"],
@@ -188,9 +175,7 @@ with update_read_data_db:
                 "isoweek_day": None,
                 "day_of_the_week": None,
                 "month_short": None,
-                "input_date": st.column_config.DateColumn(
-                    format="YYYY-MM-DD", required=True
-                ),
+                "input_date": st.column_config.DateColumn(format="YYYY-MM-DD", required=True),
                 "expense_category": st.column_config.SelectboxColumn(
                     options=[
                         "Cleaning Producs",
@@ -229,9 +214,7 @@ with update_read_data_db:
                 default_value_input_date = db_dataframe.at[key, "input_date"]
                 # use the default value as default in case nothing as been found in the session_state
                 session_input_date = (
-                    st.session_state["editable_dataframe"]["edited_rows"]
-                    .get(key, {})
-                    .get("input_date", default_value_input_date)
+                    st.session_state["editable_dataframe"]["edited_rows"].get(key, {}).get("input_date", default_value_input_date)
                 )
 
                 # EXPENSE TYPE
@@ -239,9 +222,7 @@ with update_read_data_db:
                 default_value_expense_type = db_dataframe.at[key, "expense_type"]
                 # use the default value as default in case nothing as been found in the session_state
                 session_expense_type = (
-                    st.session_state["editable_dataframe"]["edited_rows"]
-                    .get(key, {})
-                    .get("expense_type", default_value_expense_type)
+                    st.session_state["editable_dataframe"]["edited_rows"].get(key, {}).get("expense_type", default_value_expense_type)
                 )
 
                 # EXPENSE PRICE
@@ -249,30 +230,20 @@ with update_read_data_db:
                 default_value_expense_price = db_dataframe.at[key, "expense_price"]
                 # use the default value as default in case nothing as been found in the session_state
                 session_expense_price = (
-                    st.session_state["editable_dataframe"]["edited_rows"]
-                    .get(key, {})
-                    .get("expense_price", default_value_expense_price)
+                    st.session_state["editable_dataframe"]["edited_rows"].get(key, {}).get("expense_price", default_value_expense_price)
                 )
 
                 # STORE
                 # get the data in the corresponding cell for the "key" and the corresponding column
                 default_value_store = db_dataframe.at[key, "store"]
                 # use the default value as default in case nothing as been found in the session_state
-                session_expense_store = (
-                    st.session_state["editable_dataframe"]["edited_rows"]
-                    .get(key, {})
-                    .get("store", default_value_store)
-                )
+                session_expense_store = st.session_state["editable_dataframe"]["edited_rows"].get(key, {}).get("store", default_value_store)
 
                 # CITY
                 # get the data in the corresponding cell for the "key" and the corresponding column
                 default_value_city = db_dataframe.at[key, "city"]
                 # use the default value as default in case nothing as been found in the session_state
-                session_expense_city = (
-                    st.session_state["editable_dataframe"]["edited_rows"]
-                    .get(key, {})
-                    .get("city", default_value_city)
-                )
+                session_expense_city = st.session_state["editable_dataframe"]["edited_rows"].get(key, {}).get("city", default_value_city)
 
                 # get automatically the month
                 month_number = str(default_value_input_date.month)
@@ -304,9 +275,7 @@ with update_read_data_db:
         temp_edited_df = db_dataframe.copy(deep=True)
 
         # Every form must have a submit button.
-        submit_data_editor_changes = right_space_submit2db.form_submit_button(
-            "Submit", help="Submit the changes to the database."
-        )
+        submit_data_editor_changes = right_space_submit2db.form_submit_button("Submit", help="Submit the changes to the database.")
 
     if submit_data_editor_changes:
         # problem: sqlalchemy.exc.OperationalError: (MySQLdb.OperationalError) (1292...
@@ -323,14 +292,10 @@ with update_read_data_db:
         temp_index_list_to_drop = []
         if st.session_state["editable_dataframe"]["deleted_rows"]:
             print("###### INSIDE ######")
-            for each_deleted_row in st.session_state["editable_dataframe"][
-                "deleted_rows"
-            ]:
+            for each_deleted_row in st.session_state["editable_dataframe"]["deleted_rows"]:
                 print("###### INSIDE THE LOOP ######")
                 # Pandas filter() by index
-                edited_df_index_filtered = temp_edited_df.filter(
-                    items=[each_deleted_row], axis=0
-                )
+                edited_df_index_filtered = temp_edited_df.filter(items=[each_deleted_row], axis=0)
                 # get only the index value connected to each row
                 temp_index_list_to_drop.append(edited_df_index_filtered["id"].iloc[0])
         else:
@@ -372,17 +337,11 @@ with update_read_data_db:
                 # get the day_number
                 day_number = datetime.strptime(input_date_value, "%Y-%m-%d").day
                 # get the isoweek
-                isoweek_day = datetime.strptime(
-                    input_date_value, "%Y-%m-%d"
-                ).isoweekday()
+                isoweek_day = datetime.strptime(input_date_value, "%Y-%m-%d").isoweekday()
                 # get the day of the week
-                day_of_the_week = datetime.strptime(
-                    input_date_value, "%Y-%m-%d"
-                ).strftime("%A")
+                day_of_the_week = datetime.strptime(input_date_value, "%Y-%m-%d").strftime("%A")
                 # get the short name of the month (for instance: "Jan")
-                month_short = datetime.strptime(input_date_value, "%Y-%m-%d").strftime(
-                    "%b"
-                )
+                month_short = datetime.strptime(input_date_value, "%Y-%m-%d").strftime("%b")
                 # get the current time
                 created_at = datetime.now()
 
