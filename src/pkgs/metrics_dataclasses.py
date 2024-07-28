@@ -101,7 +101,8 @@ class ExpenseMetric:
             return round(
                 df[df["expense_category"] == category].groupby(["expense_category"])["value"].sum(),
                 2,
-            )[0]
+            ).iloc[0]
+
         except IndexError:
             pass
 
