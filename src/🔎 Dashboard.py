@@ -78,6 +78,9 @@ with st.sidebar:
 
     """
     st.markdown("<br>", unsafe_allow_html=True)
+    st.write(
+        "[Documentation page](https://github.com/alessandro-maccario/expense_tracker_streamlit)"
+    )
 
 # If the uploaded_file is not None, then show the dashboard;
 # otherwise show the hint to upload it.
