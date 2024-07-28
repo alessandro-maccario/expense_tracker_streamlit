@@ -1,13 +1,3 @@
 *.pyc
 .env
-<<<<<<< HEAD
-attachments
-sql
-pages - temp
-CRUD.py
-ocr.py
-sqlalchemy_db.py
-sandbox.py
-=======
 .ruff_cache
->>>>>>> test_env_revert_correct
