@@ -1,3 +1,4 @@
 *.pyc
 .env
 attachments
+sql\db_expense_tracker_creation.sql
