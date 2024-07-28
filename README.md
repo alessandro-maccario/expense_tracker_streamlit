@@ -31,17 +31,17 @@ The current application supports a _.csv_, _.xlsx_ filetype.
 
 The structure of the file should contain the following columns:
 
-- date
-- expense_category
-- expense_type
-- value
-- month
-- year
-- weekday_number
-- weekday_text
-- months_text
-- store
-- city
+- _date_
+- _expense_category_
+- _expense_type_
+- _value_
+- _month_
+- _year_
+- _weekday_number_
+- _weekday_text_
+- _months_text_
+- _store_
+- _city_
 
 The columns `month`, `year`, `weekday_number`, `weekday_text`, `months_text` are automatically available by using the sampled data, because the formula needed for those columns are already in place in the Excel itself.
 
