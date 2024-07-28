@@ -65,7 +65,17 @@ The datatype of each column is given below:
 | store | string |
 | city | string |
 
-**To test which columns are not mandatory**
+**Mandatory columns** are the following:
+
+- `date`: in the format dd/mm/yyyy, that is day/month/year, such as _01/02/2024_
+- `expense_category`: such as _food_
+- `expense_type`: such as _grocery_
+- `value`: such as _40.5_
+- `month`: such as _6_ for _June_
+- `months_text`: such as _Jun_ for June
+- `year`: such as _2024_
+- `store`: such as _Lidl_
+- `city`: such as _Vienna_
 
 #### Special values for the **expense_category** column
 
@@ -77,20 +87,15 @@ The values for the `income`, `savings` and `investment` are special elements tha
 In the column `expense_category`, you are free to choose the category names as you like (except for the `income`, `savings` and `investment`, as already pointed out).
 Here, there are our suggestions (but feel free to create your own):
 
-- apparel (for anything related to clothes)
-- education & learning (for anything related to learning materials such as books, courses, online courses and so on)
-- entertainment & leisure (anything related to leisure time, such as going to the movie theather, going to the bowling alley, going to the restaurant and so on)
-- food (food related, such as grocery shopping)
-- home & living (such as the rent, the electricity bill and so on)
-- household & personal care (such as detergents for the washing machine, shampoo, toothpaste and so on)
-- restaurant (anything related to a breakfast/lunch/dinner or anything else at a restaurant place, such as getting an espresso, it can considered a _restaurant_ expense as well)
-- income (the amount of income, per month)
-- others (for anything else that does not fit into the previous categories)
-
-## TO BE ADDED:
-
-- show an example
-- what about the **income**, **savings**, **investment** categories? For the income, it really should be called **income**, otherwise it will not be considered for the waterfall diagram and the metric!
+- _apparel_ (for anything related to clothes)
+- _education & learning_ (for anything related to learning materials such as books, courses, online courses and so on)
+- _entertainment & leisure_ (anything related to leisure time, such as going to the movie theather, going to the bowling alley, going to the restaurant and so on)
+- _food_ (food related, such as grocery shopping)
+- _home & living_ (such as the rent, the electricity bill and so on)
+- _household & personal care_ (such as detergents for the washing machine, shampoo, toothpaste and so on)
+- _restaurant_ (anything related to a breakfast/lunch/dinner or anything else at a restaurant place, such as getting an espresso, it can considered a _restaurant_ expense as well)
+- _income_ (the amount of income, per month)
+- _others_ (for anything else that does not fit into the previous categories)
 
 ### Discover the application 📚
 
@@ -142,7 +147,8 @@ The current release lacks many features that a full-fledged Expense Tracker coul
 Feedbacks can come in many forms:
 
 - if you want to **contribute**, please do not hesitate to open a pull request
-- if you enjoyed using this **Expense Tracker**, leave a star on the Github page
-- if you feel very generous, click on the _buy me a coffee_ button to show your support 😉. As a coffee lover, any _Espresso_ that I can get, it's always appreciated 😄☕☕☕
+- if you enjoyed using this **Expense Tracker**, leave a star on the Github page!
+
+Thanks for passing by 😄!
 
 ---
