@@ -385,7 +385,7 @@ if uploaded_file is not None:
         )  # , annotation=annotation
 
     # --- CSS hacks --- #
-    with open(r"C:\solutions\learning_python\expense_tracker\src\style\style.css") as f:
+    with open(r"style\style.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 else:
