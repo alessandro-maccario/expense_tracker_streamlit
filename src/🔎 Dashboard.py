@@ -390,6 +390,3 @@ if uploaded_file is not None:
 
 else:
     st.text("To start the dashboard, please, upload a file using the button on the sidebar.")
-
-# TODO:
-# need to refactor the Waterfall diagram and remove references
