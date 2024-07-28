@@ -99,7 +99,7 @@ class TestMetric(unittest.TestCase):
         fake_expense_category_list = list()
         fake_value_list = list()
 
-        # now you can use:
+        # create two lists, one for expense_category and the other to create the values
         for idx in range(0, 10):
             fake_expense_category_list.append(fake.expense_category())
 
@@ -146,7 +146,7 @@ class TestMetric(unittest.TestCase):
         fake_expense_category_list = list()
         fake_value_list = list()
 
-        # now you can use:
+        # create two lists, one for expense_category and the other to create the values
         for idx in range(0, 5):
             fake_expense_category_list.append(fake.expense_category())
 
@@ -195,7 +195,7 @@ class TestMetric(unittest.TestCase):
         fake_expense_category_list = list()
         fake_value_list = list()
 
-        # now you can use:
+        # create two lists, one for expense_category and the other to create the values
         for idx in range(0, 5):
             fake_expense_category_list.append(fake.expense_category())
 
@@ -241,7 +241,7 @@ class TestMetric(unittest.TestCase):
         fake_expense_category_list = list()
         fake_value_list = list()
 
-        # now you can use:
+        # create two lists, one for expense_category and the other to create the values
         for idx in range(0, 90):
             fake_expense_category_list.append(fake.expense_category())
 
