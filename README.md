@@ -1,22 +1,18 @@
-# Expense Tracker
+# 💰 Expense Tracker
 
-### Introduction
-
-# **ADD: LINK TO THE STREAMLIT WEBPAGE**
-
-### What is an Expense Tracker? 📊
+### 📊 What is an Expense Tracker?
 
 An Expense Tracker is a tool designed to help users manage and monitor their expenses.
 It typically allows users to input their expenses, categorize them, track spending patterns, and generate reports to gain insights into their financial habits.
 
 As a starting point, this project does not contain all the functionalities that a full-fledged Expense Tracker usually has, but it includes a handful of features that can help users get a closer look at where their money goes.
 
-### Why is this useful? 🤔
+### ❓ Why is this useful?
 
 The entire idea behind using an Expense Tracker is to track in which area you are spending more and to actively decide to reduce the amount spent, in order to be able to save more.
 It has been built on the so-called [**FIRE Movement**](https://en.wikipedia.org/wiki/FIRE_movement)🔥 ideology, which is to [_maximize the savings rate by growing the gap between the living expenses and the income, and investing the difference_](https://en.wikipedia.org/wiki/FIRE_movement).
 
-### What does this application do? 💡
+### 💡 What does this application do?
 
 Simply put, it provides insight into your financial expenses. Python and Streamlit seemed like the best choices due to their ease of UI implementation.
 
@@ -29,9 +25,10 @@ This tool can immediately answer the following questions:
 - Comparing two months, in which month did you spend less/more, and on what?
 - Based on your monthly income, how much money is left after all the expenses?
 
-### How to use it?
+### 🤔 How to use it?
 
-The current application supports a _.csv_, _.xlsx_ filetype (**to be tested!**).
+The current application supports a _.csv_, _.xlsx_ filetype.
+
 The structure of the file should contain the following columns:
 
 - date
@@ -54,7 +51,6 @@ A standard Excel file looks like the following table: (excluding the date column
 | 01/06/2024 | restaurant | hamburger | 1,70 | McDonald's | New York |
 
 In addition, after firing up the application a `Download sample data as CSV` button is available that helps you understand the needed structure for the application. You can also use it as a template to insert your own data.
-**TODO: edit the sample data in order to have all the available columns**.
 
 The datatype of each column is given below:
 | date | date |
@@ -80,7 +76,6 @@ The datatype of each column is given below:
 #### Special values for the **expense_category** column
 
 The values for the `income`, `savings` and `investment` are special elements that must be called in this fashion for the Expense Tracker to be able to recognize them and display the metrics in the Web Application.
-**TODO: are we using the savings/investments for the current version? If not, delete them from here and check the application!**
 
 #### Category suggestions
 
@@ -97,7 +92,7 @@ Here, there are our suggestions (but feel free to create your own):
 - _income_ (the amount of income, per month)
 - _others_ (for anything else that does not fit into the previous categories)
 
-### Discover the application 📚
+### 📚 Discover the application
 
 You start the application by simply load the file that contains your data. In the sidebar, you can click on the _Download a sample_ to get an idea of what the file should look like. The only boundary condition, is that the data can be found in the main sheet (for instance, using _Excel_ just one sheet with all the data).
 
@@ -128,27 +123,36 @@ In the monthly comparison, select the year and month for both the left and right
 
 The monthly breakdown provides a comprehensive view of your income and spending for a specific month. You can see where you spent most of your earnings and how much is left in the selected timeframe.
 
-### Tech Stack
+### 🧠 Reasons behind this project
+
+The reasons behind the development of this project are some of the following:
+
+- 🐍: increasing my knowledge in the Python programming language
+- 🎈: increasing my knowledge of the Streamlit package
+- 🧾: creating my own Expense Tracker for an offline experience while keeping the privacy of my own data.
+
+In fact, the application **does not store any data in it** ⛔!
+
+### ⚙ Tech Stack
 
 In this project I've used:
 
-- **Python** 🐍
-- **Streamlit**: A popular open-source framework for building data-driven web applications quickly and easily using Python.
+- 🐍 **Python**
+- 🎈 **Streamlit**: A popular open-source framework for building data-driven web applications quickly and easily using Python.
   The reason behind the usage of Streamlit relies on my wish to learn more about this Python package and how far you can get by using it.
 
-### Future Development
+### 🔮 Future Development
 
 Here's a refined version of your text:
 
 The current release lacks many features that a full-fledged Expense Tracker could have. It is also a **completely free version** that you can use whenever you want. It has been built during free time, therefore it contains the basic capabilities to be functional.
 
-### Feedbacks
+### 🔄 Feedbacks
 
-Feedbacks can come in many forms:
+- 💬: if you want to **leave a feedback**, do not hesitate to contact me via my Linkedin
+- 🌱: if you want to **contribute**, please do not hesitate to open a pull request
+- ⭐: if you enjoyed using this **Expense Tracker**, leave a star on the Github page, it would be very much appreciated!
 
-- if you want to **contribute**, please do not hesitate to open a pull request
-- if you enjoyed using this **Expense Tracker**, leave a star on the Github page!
-
-Thanks for passing by 😄!
+Thanks for passing by 😄 and enjoy the Expense Tracker!
 
 ---

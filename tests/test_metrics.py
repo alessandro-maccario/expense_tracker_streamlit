@@ -267,7 +267,3 @@ class TestMetric(unittest.TestCase):
         ]["value"].sum()
 
         return self.assertTrue(result_value == expected_value)
-
-
-# To run the test from the CLI:
-# python -m unittest tests.test_metrics
