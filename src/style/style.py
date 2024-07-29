@@ -1,5 +1,4 @@
 css = """
-<style>
 /* use this code inside your css file */
 div.st-emotion-cache-1xarl3l.e1i5pmia1{
     background-color: #f5f5f5;
@@ -23,5 +22,4 @@ color: rgb(0, 68, 255);
 div.st-emotion-cache-1xarl3l.e1i5pmia1{
 font-weight: 900;
 }
-</style>
 """
