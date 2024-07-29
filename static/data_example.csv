@@ -1,8 +1,0 @@
-﻿date;expense_category;expense_type;value;month;year;weekday_number;weekday_text;months_text;store;city
-01/06/2024;income;salary;3000;6;2024;6;Saturday;Jun;company;vienna
-01/06/2024;home & living;rent;500;6;2024;6;Saturday;Jun;house;vienna
-01/06/2024;food;grocery;50;6;2024;6;Saturday;Jun;lidl;vienna
-15/06/2024;food;grocery;70;6;2024;6;Saturday;Jun;lidl;vienna
-05/06/2024;transportation;monthly ticket;50;6;2024;3;Wednesday;Jun;bus station;vienna
-01/07/2024;home & living;rent;500;7;2024;1;Monday;Jul;house;vienna
-01/07/2024;income;salary;3000;7;2024;1;Monday;Jul;company;vienna
