@@ -102,7 +102,7 @@ if uploaded_file is not None:
     )
 
     # if dataframe is completely empty (no data at all), then show a warning to the user
-    if df_expenses.index.empty == True:
+    if df_expenses.index.empty:
         st.warning(
             "Empty dataframe! Please, provide a dataframe with data inside it as shown in the _Download sample data as CSV_ button!",
             icon="⚠️",
