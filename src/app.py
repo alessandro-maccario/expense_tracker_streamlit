@@ -12,7 +12,7 @@ import time
 import numpy as np
 import pandas as pd
 import streamlit as st
-import shutil
+from style import style
 from pkgs.global_vars import today, past
 from pkgs.metrics_dataclasses import ExpenseMetric
 from pkgs.plots_dataclasses import ExpensePlot, ExpensePlotMonth
@@ -392,17 +392,35 @@ if uploaded_file is not None:
         )  # , annotation=annotation
 
     # --- CSS hacks --- #
+    css = """
+            /* use this code inside your css file */
+            div.st-emotion-cache-1xarl3l.e1i5pmia1{
+                background-color: #f5f5f5;
+                border: 2px solid;
+                padding: 10px 10px 10px 10px;
+                border-radius: 10px;
+                color: #ffc300;
+                box-shadow: 10px;
+                text-align: center;
+            }
+
+            div.st-emotion-cache-1xarl3l.e1i5pmia1{
+            background-color: #f5f5f5;
+            border: 1px solid; /* #900c3f */
+            border-radius: 50px;
+            padding: 10px 10px 10px 10px;
+            color: rgb(0, 68, 255);
+            }
+
+            /* Bold text */
+            div.st-emotion-cache-1xarl3l.e1i5pmia1{
+            font-weight: 900;
+            }
+            """
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
     # with open("style/style.css") as f:
-    #     # st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    #     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-    STREAMLIT_STATIC_PATH = Path(st.__path__[0]) / "static"
-    CSS_PATH = STREAMLIT_STATIC_PATH / "assets/css"
-    if not CSS_PATH.is_dir():
-        CSS_PATH.mkdir()
-
-    css_file = CSS_PATH / "style.css"
-    if not css_file.exists():
-        shutil.copy("src/style/style.css", css_file)
 
 else:
     st.text("To start the dashboard, please, upload a file using the button on the sidebar.")
