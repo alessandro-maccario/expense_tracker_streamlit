@@ -391,9 +391,7 @@ if uploaded_file is not None:
         )  # , annotation=annotation
 
     # --- CSS hacks --- #
-    with open(
-        "https://raw.githubusercontent.com/alessandro-maccario/expense_tracker_streamlit/blob/main/src/style/style.css"
-    ) as f:
+    with open("https://github.com/alessandro-maccario/src/style/style.css") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 else:
