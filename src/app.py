@@ -392,7 +392,7 @@ if uploaded_file is not None:
 
     # --- CSS hacks --- #
     with open(
-        "https://github.com/alessandro-maccario/expense_tracker_streamlit/src/style.css"
+        "https://raw.githubusercontent.com/alessandro-maccario/expense_tracker_streamlit/src/style.css"
     ) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
