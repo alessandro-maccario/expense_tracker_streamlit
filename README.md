@@ -1,5 +1,9 @@
 # 💰 Expense Tracker
 
+Do you want to test the application out? Click on the following Streamlit link 😄
+
+▶ [Expenses2Track](https://expenses-to-track.streamlit.app/) ◀
+
 ### 📊 What is an Expense Tracker?
 
 An Expense Tracker is a tool designed to help users manage and monitor their expenses.
