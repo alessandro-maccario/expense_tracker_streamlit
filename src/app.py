@@ -421,7 +421,7 @@ if uploaded_file is not None:
             font-weight: 900;
             }
             """
-    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+    st.markdown(f"<style>{style}</style>", unsafe_allow_html=True)
     # with open("style/style.css") as f:
     #     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
