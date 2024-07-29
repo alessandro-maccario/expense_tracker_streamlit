@@ -2,7 +2,7 @@
 
 Do you want to test the application out? Click on the following Streamlit link 😄
 
-<a href="https://expenses-to-track.streamlit.app/" target="\_blank">Expenses2Track</a>
+▶ [Expenses2Track](https://expenses-to-track.streamlit.app/) ◀
 
 ### 📊 What is an Expense Tracker?
 
