@@ -61,7 +61,10 @@ with st.sidebar:
             )
 
     # adding a download button to download sample of the data in a csv file
-    data_example_df = pd.read_csv("../static/data_example.csv", sep=";")
+    data_example_df = pd.read_csv(
+        "https://https://github.com/alessandro-maccario/expense_tracker_streamlit/blob/main/data/data_example.csv",
+        sep=";",
+    )
     # convert the dataframe to be sent to the donwload button
     data_example_encoded = convert_df(data_example_df)
 
