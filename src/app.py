@@ -12,6 +12,7 @@ import time
 import numpy as np
 import pandas as pd
 import streamlit as st
+from style import style
 from pkgs.global_vars import today, past
 from pkgs.metrics_dataclasses import ExpenseMetric
 from pkgs.plots_dataclasses import ExpensePlot, ExpensePlotMonth
@@ -391,8 +392,9 @@ if uploaded_file is not None:
         )  # , annotation=annotation
 
     # --- CSS hacks --- #
-    with open("style/style.css") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    # with open("style/style.css") as f:
+    #     # st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    st.write(style, unsafe_allow_html=True)
 
 else:
     st.text("To start the dashboard, please, upload a file using the button on the sidebar.")
