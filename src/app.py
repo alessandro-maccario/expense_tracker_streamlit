@@ -28,9 +28,6 @@ def convert_df(df: pd.DataFrame) -> pd.DataFrame:
 # set the page default setting to wide
 st.set_page_config(layout="wide", page_title="Dashboard", page_icon="🔎")
 
-dir = Path("data_example.csv").absolute
-sys.path.append(dir)
-
 # sidebar
 with st.sidebar:
     # add sidebar title
@@ -64,7 +61,7 @@ with st.sidebar:
             )
 
     # adding a download button to download sample of the data in a csv file
-    data_example_df = pd.read_csv(r"data_example.csv", sep=";")
+    data_example_df = pd.read_csv("../static/data_example.csv", sep=";")
     # convert the dataframe to be sent to the donwload button
     data_example_encoded = convert_df(data_example_df)
 
