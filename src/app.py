@@ -6,6 +6,8 @@ budget management strategy.
 
 # use streamlit
 import os
+import sys
+from pathlib import Path
 import time
 import numpy as np
 import pandas as pd
@@ -25,6 +27,9 @@ def convert_df(df: pd.DataFrame) -> pd.DataFrame:
 
 # set the page default setting to wide
 st.set_page_config(layout="wide", page_title="Dashboard", page_icon="🔎")
+
+dir = Path("data_example.csv").absolute
+sys.path.append(dir)
 
 # sidebar
 with st.sidebar:
