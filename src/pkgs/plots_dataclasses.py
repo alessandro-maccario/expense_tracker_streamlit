@@ -269,10 +269,6 @@ class ExpensePlotMonth:
         measure=None,
     ):
         """
-        Original author:
-            - Alan Jones
-            - https://towardsdatascience.com/how-to-build-waterfall-charts-with-plotly-graph-objects-a8354543c42e
-
         Create a waterfall chart using Plotly.
 
         Parameters:
