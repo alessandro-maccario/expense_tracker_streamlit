@@ -16,9 +16,11 @@ from sandbox.text_extraction import TextExtraction
 # define where tesseract lies
 pytesseract.pytesseract.tesseract_cmd = "C:/Program Files/Tesseract-OCR/tesseract.exe"
 
+# NOTE: not working correctly. Maybe use of EasyOCR:
+# NOTE: https://github.com/JaidedAI/EasyOCR
 # image processing
-image_processing = ImageProcessing()
-search_contours = image_processing.topdown_view()
+# image_processing = ImageProcessing()
+# search_contours = image_processing.topdown_view()
 
 # text extraction
 text_extraction = TextExtraction()
