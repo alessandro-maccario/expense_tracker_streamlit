@@ -10,7 +10,7 @@ import pytesseract
 
 class TextExtraction:
     def __init__(self) -> None:
-        self.image_path = "sandbox/receipt_final_scan.jpg"
+        self.image_path = "sandbox/genius_scan/genius_scan_2.jpg"
 
     # Step 2: Extract text using Tesseract
     def extract_text(self):
