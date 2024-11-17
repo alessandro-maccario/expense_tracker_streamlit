@@ -6,7 +6,7 @@ authors = ["alessandro-maccario <a.maccario1@campus.unimib.it>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.9.7 || >3.9.7,<4.0"
+python = ">=3.10,<4.0"
 pandas = "^2.2.1"
 numpy = "^1.26.4"
 openpyxl = "^3.1.2"
@@ -16,6 +16,11 @@ sqlalchemy = "^2.0.30"
 python-dotenv = "^1.0.1"
 ruff = "^0.5.1"
 faker = "^26.0.0"
+pytesseract = "^0.3.13"
+opencv-python = "^4.10.0.84"
+imutils = "^0.5.4"
+scipy = "^1.14.1"
+scikit-image = "^0.24.0"
 
 
 [build-system]
