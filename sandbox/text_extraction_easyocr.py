@@ -18,7 +18,7 @@ reader = easyocr.Reader(
 result = reader.readtext("sandbox/20241116_090948.jpg")
 # result_string = ",".join(result)
 
-# with open("text_extraction.txt", "w") as f:
+# with open("sandbox/text_extraction.txt", "w") as f:
 #     f.write(result_string)
 
 print(print("--- %s seconds ---" % (time.time() - start_time)))
