@@ -1,12 +1,11 @@
 import cv2
 import imutils
 from imutils.perspective import four_point_transform
-from skimage.filters import threshold_local
 
 
 class ImageProcessing:
     def __init__(self) -> None:
-        self.image_path = "sandbox/20241116_090948.jpg"
+        self.image_path = "sandbox/genius_scan/genius_scan.jpg"
         self.ratio = 0
 
     def load_image(self):
@@ -34,10 +33,6 @@ class ImageProcessing:
         )
         edged = cv2.Canny(blurred, 75, 200)
 
-        # Repeated Closing operation to remove text from the document and improve edge detection
-        # kernel = np.ones((5, 5), np.uint8)
-        # img_morphed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel, iterations=3)
-
         # save the image without the background and most of the content
         # cv2.imwrite("sandbox/receipt_edged.jpg", img_morphed)
 
@@ -64,6 +59,7 @@ class ImageProcessing:
             if len(approx) == 4:
                 receiptCnt = approx
                 break
+
         # if the receipt contour is empty then our script could not find the
         # outline and we should be notified
         if receiptCnt is None:
@@ -75,9 +71,6 @@ class ImageProcessing:
             )
 
         return receiptCnt
-
-        # save the image without the background
-        # cv2.imwrite("sandbox/receipt_edged.jpg", edged)
 
     def topdown_view(self):
         # load the original image
@@ -95,22 +88,6 @@ class ImageProcessing:
 
         con = cv2.drawContours(orig, [reshape_contours], -1, (0, 255, 0), 20)
         cv2.imwrite("sandbox/test.jpg", con)  # DRAW ALL
-        ########################################
-
-        #######################
-        # gray = cv2.cvtColor(receipt, cv2.COLOR_BGR2GRAY)
-        # scan_like = cv2.adaptiveThreshold(
-        #     gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 13, 21
-        # )
-        # convert the warped image to grayscale, then threshold it
-
-        # to give it that 'black and white' paper effect
-        warped = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
-        T = threshold_local(warped, 11, offset=10, method="gaussian")
-        warped = (warped > T).astype("uint8") * 255
-
-        #######################
 
         # save transformed image
         cv2.imwrite("sandbox/receipt_topdown_view.jpg", imutils.resize(receipt, width=500))
-        cv2.imwrite("sandbox/receipt_final_scan.jpg", scan_like)
